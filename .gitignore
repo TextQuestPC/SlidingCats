@@ -9,6 +9,7 @@
 [Pp]ackages/
 [Ll]ogs/
 /[Pp]rojectSettings/
+Assets/Firebase
 
 sysinfo.txt
 *.stackdump

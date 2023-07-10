@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1057208070273",
+    "project_id": "cats-sliding-puzzle",
+    "storage_bucket": "cats-sliding-puzzle.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057208070273:android:7aaae82bb31d440c32dd80",
+        "android_client_info": {
+          "package_name": "com.bibidabo.catsslidingpuzzle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7VOo7DSsAMVb1nge6877KIFag4VpwtKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
