@@ -1,14 +1,17 @@
-﻿using BFF;
+﻿using System;
+using BFF;
 using Models;
 using Other;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace UI
 {
     public class BlockItem : MonoBehaviour//, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
     {
+        public static Action<int> Touched;
+        public static Action<Vector2> Selected;
+        
         public GameObject blockImgNode;
         public Sprite[] blockSpriteFrameColor1;
         public Sprite[] blockSpriteFrameColor2;
@@ -19,6 +22,7 @@ namespace UI
         private Sprite _tmpSprite;
         private Vector2 _startPos;
         private Vector2 _originalPos;
+        public Vector2 OriginalPos { get; private set; }
         private int[] _data;
         private int[] _tmpEdgePos;
         private int _deltaX = 0;
@@ -85,12 +89,19 @@ namespace UI
             return _tmpSprite;
         }
 
+        public void SetOriginalPos()
+        {
+            OriginalPos = GetComponent<RectTransform>().position;
+        }
+
         public void UpdateUi(int[] data, GameObject bgLightEff = null, GameObject bgTip = null, GameObject lightTip = null)
         {
             if (gameObject.GetComponent<Touchable>() == null)
-            {
                 gameObject.AddComponent<Touchable>();
-            }
+
+            if (data[(int)Blocks.Key.Length] >= 4 && PlayerPrefs.HasKey("COMPLETE_GUIDE"))
+                data[(int) Blocks.Key.Length]--;
+            
             GetComponent<Touchable>().objectID = data;
 
             _data = data;
@@ -99,6 +110,7 @@ namespace UI
             _blockLightTip = lightTip;
 
             var blockLength = data[(int)Blocks.Key.Length];
+            
             switch (data[(int)Blocks.Key.Color])
             {
                 case (int)Blocks.Color.Blue:
@@ -124,6 +136,12 @@ namespace UI
 
         public void OnPointerDown()
         {
+            Touched?.Invoke(GetPosIndex());
+            SetOriginalPos();
+            Selected?.Invoke(OriginalPos);
+            
+            _tmpSprite = null;
+            
             if (!Player.UserCanMove) return;
 
             if (IsSpecial() && GetSpecial() == (int)Blocks.Special.Stone)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Manager;
 using Other;
+using UnityEngine;
 
 
 namespace Models
@@ -10,7 +11,7 @@ namespace Models
     {
         public static bool IsBlockMoving { get; set; } = false;
         public static bool UserCanMove { get; set; } = false;
-
+        
         private static int _curScore = 0;
         private static int _bestScore = 0;
         private static string _newBestStatus = "no";
@@ -379,6 +380,7 @@ namespace Models
             if (_guideStepData != null && _guideData.step >= _guideStepData.Length)
             {
                 _guideData.end = true;
+                PlayerPrefs.SetInt("COMPLETE_GUIDE", 1);
                 ManagerLocalData.SetTableData(ManagerLocalData.GUIDE, _guideData);
             }
         }

@@ -34,6 +34,8 @@ namespace UI
 
         private readonly List<List<int[]>> _readyBlocksData = new List<List<int[]>>();
         private readonly GameObject[] _itemList = new GameObject[Constant.Lie * Constant.Hang];
+        public IReadOnlyList<GameObject> ItemList => _itemList;
+        
         private bool _userMove;
         private int _userMoveLevel = 100;
         private int _unitBlockScore;
@@ -75,7 +77,7 @@ namespace UI
             }
         }
 
-        void RemoveAllBlockItems()
+        public void RemoveAllBlockItems()
         {
             ResetClearTipTime();
             for (var i = 0; i < _itemList.Length; ++i)
@@ -263,7 +265,7 @@ namespace UI
             ResetData();
         }
 
-        private void ResetData()
+        public void ResetData()
         {
             Constant.GameStatusData.IsFirstGetBestScorePreGame = true;
             
@@ -1541,7 +1543,7 @@ namespace UI
             return item;
         }
 
-        void RemoveBlockItemByIndex(int index, bool showAnim = true)
+        public void RemoveBlockItemByIndex(int index, bool showAnim = true)
         {
             if (_itemList[index] != null)
             {
@@ -1582,7 +1584,7 @@ namespace UI
             }
         }
 
-        void UpBlockItemsAnim()
+        private void UpBlockItemsAnim()
         {
             for (var i = _itemList.Length - 1; i >= 0; --i)
             {
@@ -1606,7 +1608,7 @@ namespace UI
             ManagerAudio.PlaySound("blockUp");
         }
 
-        void DownBlockItemsAnim(List<int[]> downList)
+        public void DownBlockItemsAnim(List<int[]> downList)
         {
             foreach (var downData in downList)
             {

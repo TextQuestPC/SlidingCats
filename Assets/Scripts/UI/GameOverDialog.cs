@@ -13,6 +13,8 @@ namespace UI
 {
     public class GameOverDialog : MonoBehaviour
     {
+        [SerializeField] private AdsInterstitialActivator adsInterstitialActivator;
+        
         public TextMeshProUGUI curScore;
         public TextMeshProUGUI bestScore;
         public TextMeshProUGUI newBestScore;
@@ -33,12 +35,9 @@ namespace UI
             }
         }
         
-        // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             ManagerAudio.PauseBgm();
-
-
             
             btnAgain.SetActive(false);
             bestScore.text = Player.GetBestScore().ToString();
@@ -280,6 +279,7 @@ namespace UI
                     ManagerDialog.DestroyDialog("GameOverDialog");
                     Constant.GamePlayScript.RestartGame();
                     ManagerAudio.ResumeBgm();
+                    adsInterstitialActivator.ShowAds();
                     break;
             }
             
