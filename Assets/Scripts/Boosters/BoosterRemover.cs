@@ -14,6 +14,8 @@ namespace Boosters
         private bool _isActivated = false;
 
         private void OnEnable() => BlockItem.Selected += OnSelected;
+        
+        
 
         private void OnDisable() => BlockItem.Selected -= OnSelected;
 
@@ -51,19 +53,6 @@ namespace Boosters
                 StartCoroutine(Delay.Run(() => { gamePlayDialog.MoveEnd(); }, 0.05f));
                 Player.SaveGameStatusData();
                 _isActivated = false;
-                
-                // List<BlockItem> itemsToRemove = new List<BlockItem>();
-                // for (int i = 0; i < gamePlayDialog.ItemList.Count; i++)
-                // {
-                //     var posX = position.x;
-                //
-                //     if (gamePlayDialog.ItemList[i].GetComponent<BlockItem>())
-                //     {
-                //         
-                //     }
-                // }
-
-
             }
         }
 

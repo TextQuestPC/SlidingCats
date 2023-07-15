@@ -27,9 +27,16 @@ namespace Boosters
         private void Start()
         {
             if (PlayerPrefs.HasKey(boosterType.ToString()))
-                Count = PlayerPrefs.GetInt(boosterType.ToString());
+                Count = ManagerLocalData.GetIntData(boosterType.ToString());
             else
-                Save(Count);
+            {
+                if (boosterType == BoosterType.Break)
+                    Count = 4;
+                else if (boosterType == BoosterType.Remove)
+                    Count = 2;
+
+                Save();
+            }
             
             ValueChanged?.Invoke();
         }
@@ -41,7 +48,7 @@ namespace Boosters
             if (gold.TrySpend(price))
             {
                 Count++;
-                Save(Count);
+                Save();
                 return true;
             }
     
@@ -58,14 +65,14 @@ namespace Boosters
             if (Count <= 0) return false;
             
             Count--;
-            Save(Count);
+            Save();
             
             return true;
         }
     
-        private void Save(int count)
+        private void Save()
         {
-            ManagerLocalData.SetIntData(boosterType.ToString(), count);
+            ManagerLocalData.SetIntData(boosterType.ToString(), Count);
             ValueChanged?.Invoke();
         }
     }
