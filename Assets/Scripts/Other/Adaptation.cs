@@ -21,9 +21,6 @@ public class Adaptation : MonoBehaviour
 
     private void Awake()
     {
-      
-
-        Debug.Log("adaptation: " + Screen.safeArea.top);
         Vector3 temVector = new Vector3();
         temVector = topUI.transform.localPosition;
         temVector.y -= Screen.safeArea.top;

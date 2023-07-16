@@ -40,7 +40,6 @@ namespace UI
         void Start()
         {
             ManagerLocalData.SetStringData(ManagerLocalData.VIBRATE_SWITCH,"dontShow");
-            Debug.Log("SettingDialog" + ManagerLocalData.GetStringData(ManagerLocalData.VIBRATE_SWITCH));
             
             
             if (!ManagerLocalData.HaveData(ManagerLocalData.VIBRATE_SWITCH))
