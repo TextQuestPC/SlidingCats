@@ -13,7 +13,7 @@ namespace GleyMobileAds
         protected override void OnActionGUI()
         {
             PropertyField("Position", position);
-            PropertyField("Banner Type", bannerType);
+            PropertyField("Banner BoosterSprite", bannerType);
         }
     }
 }

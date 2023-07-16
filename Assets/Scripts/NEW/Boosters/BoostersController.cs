@@ -35,6 +35,20 @@ namespace Boosters
             BoosterIsActive = false;
         }
 
+        public void AddBooster(TypeBooster typeBooster, int count)
+        {
+            if (typeBooster == TypeBooster.Hammer)
+            {
+                countHammer += count;
+            }
+            else if (typeBooster == TypeBooster.Magnet)
+            {
+                countMagnet += count;
+            }
+
+            SaveCountBooster();
+        }
+
         public void TryActivateBooster(TypeBooster typeBooster)
         {
             if (activeBooster == typeBooster)

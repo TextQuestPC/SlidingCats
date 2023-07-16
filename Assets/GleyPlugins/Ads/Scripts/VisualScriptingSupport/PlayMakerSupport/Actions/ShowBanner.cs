@@ -8,7 +8,7 @@ namespace HutongGames.PlayMaker.Actions
     {
         [Tooltip("Location of the banner")]
         public BannerPosition bannerPosition;
-        [Tooltip("Banner Type(Regular or Smart Banner)")]
+        [Tooltip("Banner BoosterSprite(Regular or Smart Banner)")]
         public BannerType bannerType;
 
         public override void OnEnter()
