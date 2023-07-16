@@ -9,12 +9,8 @@ namespace Boosters
         [SerializeField] private TypeBooster typeBooster;
         [SerializeField] private TextMeshProUGUI countText;
         [SerializeField] private Image icon;
-        [SerializeField] private Sprite activeSrite, blockSprite;
+        [SerializeField] private Sprite activeSrite, defaultSprite;
 
-        private bool isActive;
-        
-        public TypeBooster GetTypeBooster => typeBooster;
-        
         private void Start()
         {
             GetComponent<Button>().onClick.AddListener(() =>
@@ -26,8 +22,11 @@ namespace Boosters
         public void SetData(int count)
         {
             countText.text = count.ToString();
-            isActive = count > 0;
-            icon.sprite = isActive ? activeSrite : blockSprite;
+        }
+        
+        public void SetActive(bool isActive)
+        {
+            icon.sprite = isActive ? activeSrite : defaultSprite;
         }
     }
 }

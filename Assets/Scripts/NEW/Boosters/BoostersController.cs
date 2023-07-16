@@ -14,7 +14,6 @@ namespace Boosters
         [SerializeField] private Booster hammerBooster, magnetBooster;
         [SerializeField] private GamePlayDialog gamePlayDialog;
 
-
         private int countHammer = 0, countMagnet = 0;
 
         private TypeBooster activeBooster;
@@ -41,11 +40,13 @@ namespace Boosters
             {
                 activeBooster = TypeBooster.Hammer;
                 BlockItem.Touched += UseHammer;
+                hammerBooster.SetActive(true);
             }
             else if (typeBooster == TypeBooster.Magnet && countMagnet > 0)
             {
                 activeBooster = TypeBooster.Magnet;
                 BlockItem.Selected += UseMagnet;
+                magnetBooster.SetActive(true);
             }
         }
 
@@ -102,6 +103,9 @@ namespace Boosters
 
             BlockItem.Touched -= UseHammer;
             BlockItem.Selected -= UseMagnet;
+            
+            magnetBooster.SetActive(false);
+            hammerBooster.SetActive(false);
         }
     }
 
