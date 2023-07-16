@@ -1,4 +1,5 @@
 using Boosters;
+using DG.Tweening;
 using Models;
 using Other;
 using UI;
@@ -20,6 +21,8 @@ namespace Boosters
 
         private TypeBooster activeBooster;
 
+        public bool BoosterIsActive;
+
         protected override void AfterAwaik()
         {
             countHammer = PlayerPrefs.GetInt(KEY_HAMMER, DEFAULT_COUNT_HAMMER);
@@ -28,6 +31,8 @@ namespace Boosters
 
             hammerBooster.SetData(countHammer);
             magnetBooster.SetData(countMagnet);
+
+            BoosterIsActive = false;
         }
 
         public void TryActivateBooster(TypeBooster typeBooster)
@@ -44,7 +49,8 @@ namespace Boosters
             }
 
             activeBooster = typeBooster;
-
+            BoosterIsActive = true;
+            
             if (typeBooster == TypeBooster.Hammer && countHammer > 0)
             {
                 activeBooster = TypeBooster.Hammer;
@@ -70,6 +76,8 @@ namespace Boosters
             SaveCountBooster();
 
             DisableBoosters();
+
+            DOTween.Sequence().AppendInterval(0.1f).OnComplete(() => BoosterIsActive = false);
         }
 
         private void UseMagnet(Vector2 position)
@@ -83,6 +91,8 @@ namespace Boosters
             SaveCountBooster();
 
             DisableBoosters();
+            
+            DOTween.Sequence().AppendInterval(0.1f).OnComplete(() => BoosterIsActive = false);
         }
 
         private void PlayAudio()
@@ -105,6 +115,7 @@ namespace Boosters
 
             BlockItem.Touched -= UseHammer;
             BlockItem.Selected -= UseMagnet;
+            // BlockItem.OnPointerUp();
 
             magnetBooster.SetActive(false);
             hammerBooster.SetActive(false);

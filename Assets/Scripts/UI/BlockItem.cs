@@ -1,5 +1,6 @@
 ﻿using System;
 using BFF;
+using Boosters;
 using Models;
 using Other;
 using UnityEngine;
@@ -152,7 +153,7 @@ namespace UI
 
             if (Player.IsBlockMoving) return;
 
-            if (Constant.SceneVersion == "3")
+            if (Constant.SceneVersion == "3" && !BoostersController.Instance.BoosterIsActive)
             {
                 _blockLightTip.GetComponent<Image>().sprite = blockImgNode.GetComponent<Image>().sprite;
                 _blockLightTip.GetComponent<RectTransform>().sizeDelta = new Vector2(Constant.BlockWidth * GetLength(), Constant.BlockHeight);
@@ -185,6 +186,7 @@ namespace UI
             }
 
             if (Player.IsBlockMoving) return;
+            
             Player.IsBlockMoving = true;
 
             _startPos = pos * 1;
@@ -242,6 +244,7 @@ namespace UI
 
             if (!Player.UserCanMove) return;
             if (!Player.IsBlockMoving) return;
+            
             Player.IsBlockMoving = false;
 
             HideBlockBgLightEff();

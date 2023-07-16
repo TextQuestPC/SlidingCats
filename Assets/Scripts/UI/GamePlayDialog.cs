@@ -4,6 +4,7 @@
  * Copyright (c) 2022 dotmobstudio
  * Support : dotmobstudio@gmail.com
  */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace UI
         public GameObject blockGroup;
         public GameObject readyGroup;
 
-        
+
         public GameObject blockBgLightEff;
         public GameObject blockBgTip;
         public GameObject blockLightTip;
@@ -35,7 +36,7 @@ namespace UI
         private readonly List<List<int[]>> _readyBlocksData = new List<List<int[]>>();
         private readonly GameObject[] _itemList = new GameObject[Constant.Lie * Constant.Hang];
         public IReadOnlyList<GameObject> ItemList => _itemList;
-        
+
         private bool _userMove;
         private int _userMoveLevel = 100;
         private int _unitBlockScore;
@@ -59,6 +60,7 @@ namespace UI
 
         private GameObject _specialGoldItem = null;
         private int _specialGoldEffNoNewBlocksTime = 0;
+
         private Ease _easeEff = Ease.OutSine;
         //        private Ease _easeEff = Ease.InOutCubic;
 
@@ -103,7 +105,6 @@ namespace UI
 
         private async Task<bool> LoadResAsync_BlockItem()
         {
-            
             if (_blockItemsPool == null)
             {
                 _blockItemsPool = new ObjectPool();
@@ -118,7 +119,7 @@ namespace UI
         {
             await LoadResAsync_BlockItem();
 
-            
+
             readyGroup.GetComponent<ReadyGroup>().InitRes();
 
             if ((Constant.SceneVersion == "1" || Constant.SceneVersion == "2") && Constant.IsDeviceSoHeight)
@@ -133,10 +134,9 @@ namespace UI
         // Start is called before the first frame update
         async void Start()
         {
-            
             CreateBlockBgLightEff();
 
-            
+
             if (Constant.SceneVersion == "3")
             {
                 if (!ManagerLocalData.HaveData(ManagerLocalData.BLOCKS_DATA))
@@ -151,7 +151,7 @@ namespace UI
             UpdateScoreUi(false);
 
             await LoadRes();
-            
+
             Blocks.UpdateLengthRate(Constant.GameStatusData.SlideNumber);
 
             if (Constant.GameStatusData.DWAD_REMAINING_STEP > 0)
@@ -174,7 +174,7 @@ namespace UI
                 ManagerLocalData.SetStringData(ManagerLocalData.AF_PLAY_DAY, "true");
             }
 
-           
+
             if (Player.ShouldShowIceTip() && (Player.GetBestScore() >= 4000 || Player.GetCurScore() >= 4000))
             {
                 Player.SetAlreadyShowIceTip();
@@ -205,7 +205,6 @@ namespace UI
 
         private void SendEvent()
         {
-
         }
 
         private void OnApplicationPause(bool pauseStatus)
@@ -221,14 +220,14 @@ namespace UI
         {
 //            if (Blocks.IsTesting()) return;
 //            StartCoroutine(Delay.Run(() => { AppLovinMediationAdapter.Instance.OnGuideComplete(); }, 5f));
-            
+
             // todo txy 
         }
 
         private void CheckShowTopUIMask(bool isStart = false)
         {
             return;
-        
+
             if (Constant.SceneVersion == "3")
             {
                 var topUIObj = gameObject.transform.Find("topUI").transform.Find("topMask").gameObject;
@@ -255,7 +254,6 @@ namespace UI
 
         public void RestartGame(bool isRestart = false)
         {
-
             _isRestart = isRestart;
             if (_isRestart)
             {
@@ -268,7 +266,7 @@ namespace UI
         public void ResetData()
         {
             Constant.GameStatusData.IsFirstGetBestScorePreGame = true;
-            
+
             Player.AddLoginDay();
             Player.UserCanMove = false;
             _unitBlockScore = 1;
@@ -280,10 +278,9 @@ namespace UI
                 var blocksData = ManagerLocalData.GetTableData<int[][]>(ManagerLocalData.BLOCKS_DATA);
                 if (!Player.IsInGuide())
                 {
-                   
                     Blocks.SetBlocksData(blocksData);
 
-                  
+
                     blocksData = Blocks.CheckSpecialBlockSwitch();
 
                     CreateBlocks(blocksData);
@@ -293,7 +290,7 @@ namespace UI
                     Blocks.ResetData();
                 }
 
-                
+
                 if (Player.IsInGuide() && Player.GetGuideStep() == 1)
                 {
                     var nextData = Blocks.GetNextBlocksData();
@@ -304,6 +301,7 @@ namespace UI
                 {
                     _readyBlocksData.Add(Blocks.GetNextBlocksData());
                 }
+
                 _readyBlocksData.Add(Blocks.GetNextBlocksData());
 
                 AddReadyBlockItems();
@@ -311,7 +309,6 @@ namespace UI
             }
             else
             {
-                
                 _stepScore = 0;
                 Player.SetCurScore(0);
                 Player.ResetNewBestStatus();
@@ -343,10 +340,10 @@ namespace UI
                 {
                     AddBlockItems();
                     StartCoroutine(Delay.Run(() =>
-                        {
-                            AddBlockItems();
-                            StartCoroutine(Delay.Run(() => { MoveEnd(); }, Constant.UpAnimTime + 0.01f));
-                        }, Constant.UpAnimTime + 0.01f));
+                    {
+                        AddBlockItems();
+                        StartCoroutine(Delay.Run(() => { MoveEnd(); }, Constant.UpAnimTime + 0.01f));
+                    }, Constant.UpAnimTime + 0.01f));
 
                     Constant.GameStatusData.InningTime = 0.00f;
 
@@ -375,6 +372,11 @@ namespace UI
         {
             Constant.EffCtrlScript.ShowClearBlockEff(_itemList[index]);
 
+            var score = _itemList[index].GetComponent<BlockItem>().GetLength() *
+                        _unitBlockScore;
+
+            UpdateScore(score);
+
             Blocks.ClearBlockDataByIndex(index);
             RemoveBlockItemByIndex(index, true);
             Blocks.UpdateMap();
@@ -386,6 +388,7 @@ namespace UI
         {
             var itemList = ItemList;
             var posY = position.y;
+            int score = 0;
 
             for (var i = 0; i < itemList.Count; ++i)
             {
@@ -401,6 +404,9 @@ namespace UI
                         {
                             Constant.EffCtrlScript.ShowClearBlockEff(_itemList[i]);
 
+                            score += _itemList[i].GetComponent<BlockItem>().GetLength() *
+                                     _unitBlockScore;
+
                             Blocks.ClearBlockDataByIndex(i);
                             RemoveBlockItemByIndex(i, true);
                         }
@@ -408,12 +414,24 @@ namespace UI
                 }
             }
 
+            UpdateScore(score);
             Blocks.UpdateMap();
             StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.05f));
             Player.SaveGameStatusData();
         }
-        
-        public void MoveEnd(int[] moveData = null, string previousBlocks = "", bool specialGoldSuccess = false, bool autoClear = true)
+
+        private void UpdateScore(int score)
+        {
+            Constant.EffCtrlScript.ShowScoreEff(score);
+
+            Player.SetCurScore(Player.GetCurScore() + score);
+            StartCoroutine(Delay.Run(() => { UpdateScoreUi(); }, Constant.ScoreUpdateDelayTime));
+
+            DOTween.Sequence().AppendInterval(0.1f).OnComplete(() => Player.IsBlockMoving = false);
+        }
+
+        public void MoveEnd(int[] moveData = null, string previousBlocks = "", bool specialGoldSuccess = false,
+            bool autoClear = true)
         {
             if (Blocks.GetHangNum() <= 0 && Blocks.GetMaxHangNumByScore(Player.GetCurScore()) >= 3)
             {
@@ -434,12 +452,12 @@ namespace UI
                 _movedBlockItem = null;
             }
 
-            
+
             if (moveData != null)
             {
                 _movedBlockItem = _itemList[moveData[2]];
 
-               
+
                 if (_movedBlockItem == null)
                 {
                     RemoveAllBlockItems();
@@ -517,6 +535,7 @@ namespace UI
                 {
                     Constant.PreviousBlocks = JsonConvert.SerializeObject(Blocks.GetBlocksData());
                 }
+
                 canClear = Blocks.ClearBlocks(out clearHang, out clearSpecialBlocks);
             }
 
@@ -524,584 +543,578 @@ namespace UI
             {
                 DownBlockItemsAnim(downBlocks);
                 StartCoroutine(Delay.Run(() =>
+                {
+                    if (canClear)
                     {
-                        if (canClear)
+                        if (!_firstTimeRemove)
                         {
-                            if (!_firstTimeRemove)
+                            _firstTimeRemove = true;
+                        }
+
+                        Constant.GameStatusData.RemoveNumber += clearHang.Count;
+                        if (Player.IsSecondChanceUsed())
+                        {
+                            Constant.GameStatusData.ContinueRemove += clearHang.Count;
+                        }
+
+
+                        var clearSpecialEdgeBlocks = new List<int>();
+
+                        List<int[]> newBlocks = null;
+                        List<int> clearSpecialEdgeBlocksBronze = null;
+                        Dictionary<int, List<int[]>> specialEdgeBronzeToNew = null;
+
+                        var isSpecialGold = false;
+
+                        GameObject specialGoldItem = null;
+                        bool shouldVibrator = true;
+
+                        foreach (var specialData in clearSpecialBlocks)
+                        {
+                            switch (specialData[(int)Blocks.Key.Special])
                             {
-                                _firstTimeRemove = true;
-                            }
-                            Constant.GameStatusData.RemoveNumber += clearHang.Count;
-                            if (Player.IsSecondChanceUsed())
-                            {
-                                Constant.GameStatusData.ContinueRemove += clearHang.Count;
-                            }
-
-                       
-                            var clearSpecialEdgeBlocks = new List<int>();
-                        
-                            List<int[]> newBlocks = null;
-                            List<int> clearSpecialEdgeBlocksBronze = null;
-                            Dictionary<int, List<int[]>> specialEdgeBronzeToNew = null;
-                      
-                            var isSpecialGold = false;
-
-                            GameObject specialGoldItem = null;
-                            bool shouldVibrator = true;
-
-                            foreach (var specialData in clearSpecialBlocks)
-                            {
-                                switch (specialData[(int)Blocks.Key.Special])
-                                {
-                                    case (int)Blocks.Special.Rainbow:
-                                        clearSpecialEdgeBlocks.AddRange(Blocks.ClearSpecialEdgeBlocks(specialData));
-                                        break;
-                                    case (int)Blocks.Special.Bronze:
-                                        if (clearSpecialEdgeBlocksBronze == null)
-                                        {
-                                            clearSpecialEdgeBlocksBronze = new List<int>();
-                                        }
-                                        clearSpecialEdgeBlocksBronze.AddRange(Blocks.SplitSpecialEdgeBlocks(specialData, out var tmpNewBlocks, out var tmpEdgeToNew));
-
-                                        if (tmpNewBlocks.Count > 0)
-                                        {
-                                            shouldVibrator = false;
-                                        }
-                                        
-                                        if (newBlocks == null)
-                                        {
-                                            newBlocks = new List<int[]>();
-                                        }
-                                        newBlocks.AddRange(tmpNewBlocks);
-
-                                        if (specialEdgeBronzeToNew == null)
-                                        {
-                                            specialEdgeBronzeToNew = new Dictionary<int, List<int[]>>();
-                                        }
-                                        specialEdgeBronzeToNew.Add(specialData[(int)Blocks.Key.Pos], tmpEdgeToNew);
-                                        break;
-                                    case (int)Blocks.Special.Gold:
-                                        isSpecialGold = true;
-                                        specialGoldItem = _itemList[specialData[(int) Blocks.Key.Pos]];
-                                        shouldVibrator = false;
-                                        break;
-                                }
-                            }
-
-                         
-                            if (clearSpecialEdgeBlocks.Count > 0)
-                            {
-                                var tmpSpecialEdge = new List<int>();
-                                while (clearSpecialEdgeBlocks.Find(posIndex =>
-                                    _itemList[posIndex] != null && _itemList[posIndex].GetComponent<BlockItem>().IsSpecial()) > 0)
-                                {
-                                    var clearSpecialEdge2 = new List<int>();
-                                    for (var i = clearSpecialEdgeBlocks.Count - 1; i >= 0; --i)
+                                case (int)Blocks.Special.Rainbow:
+                                    clearSpecialEdgeBlocks.AddRange(Blocks.ClearSpecialEdgeBlocks(specialData));
+                                    break;
+                                case (int)Blocks.Special.Bronze:
+                                    if (clearSpecialEdgeBlocksBronze == null)
                                     {
-                                        if (_itemList[clearSpecialEdgeBlocks[i]] != null && _itemList[clearSpecialEdgeBlocks[i]].GetComponent<BlockItem>().IsSpecial())
-                                        {
-                                            var itemScript = _itemList[clearSpecialEdgeBlocks[i]]
-                                                .GetComponent<BlockItem>();
-                                            switch (itemScript.GetSpecial())
-                                            {
-                                                case (int)Blocks.Special.Rainbow:
-                                                    clearSpecialEdge2.AddRange(Blocks.ClearSpecialEdgeBlocks(_itemList[clearSpecialEdgeBlocks[i]].GetComponent<BlockItem>().GetData()));
-                                                    break;
-                                                case (int)Blocks.Special.Bronze:
-                                                    if (clearSpecialEdgeBlocksBronze == null)
-                                                    {
-                                                        clearSpecialEdgeBlocksBronze = new List<int>();
-                                                    }
-                                                    clearSpecialEdgeBlocksBronze.AddRange(Blocks.SplitSpecialEdgeBlocks(itemScript.GetData(), out var tmpNewBlocks, out var tmpEdgeToNew));
-
-                                                    if (newBlocks == null)
-                                                    {
-                                                        newBlocks = new List<int[]>();
-                                                    }
-                                                    newBlocks.AddRange(tmpNewBlocks);
-
-                                                    if (specialEdgeBronzeToNew == null)
-                                                    {
-                                                        specialEdgeBronzeToNew = new Dictionary<int, List<int[]>>();
-                                                    }
-                                                    specialEdgeBronzeToNew.Add(itemScript.GetPosIndex(), tmpEdgeToNew);
-                                                    break;
-                                                case (int)Blocks.Special.Gold:
-                                                    isSpecialGold = true;
-                                                    specialGoldItem = _itemList[clearSpecialEdgeBlocks[i]];
-                                                    break;
-                                            }
-
-                                            tmpSpecialEdge.Add(clearSpecialEdgeBlocks[i]);
-                                            clearSpecialEdgeBlocks.RemoveAt(i);
-                                        }
+                                        clearSpecialEdgeBlocksBronze = new List<int>();
                                     }
 
-                                    clearSpecialEdgeBlocks.AddRange(clearSpecialEdge2);
+                                    clearSpecialEdgeBlocksBronze.AddRange(Blocks.SplitSpecialEdgeBlocks(specialData,
+                                        out var tmpNewBlocks, out var tmpEdgeToNew));
+
+                                    if (tmpNewBlocks.Count > 0)
+                                    {
+                                        shouldVibrator = false;
+                                    }
+
+                                    if (newBlocks == null)
+                                    {
+                                        newBlocks = new List<int[]>();
+                                    }
+
+                                    newBlocks.AddRange(tmpNewBlocks);
+
+                                    if (specialEdgeBronzeToNew == null)
+                                    {
+                                        specialEdgeBronzeToNew = new Dictionary<int, List<int[]>>();
+                                    }
+
+                                    specialEdgeBronzeToNew.Add(specialData[(int)Blocks.Key.Pos], tmpEdgeToNew);
+                                    break;
+                                case (int)Blocks.Special.Gold:
+                                    isSpecialGold = true;
+                                    specialGoldItem = _itemList[specialData[(int)Blocks.Key.Pos]];
+                                    shouldVibrator = false;
+                                    break;
+                            }
+                        }
+
+
+                        if (clearSpecialEdgeBlocks.Count > 0)
+                        {
+                            var tmpSpecialEdge = new List<int>();
+                            while (clearSpecialEdgeBlocks.Find(posIndex =>
+                                       _itemList[posIndex] != null &&
+                                       _itemList[posIndex].GetComponent<BlockItem>().IsSpecial()) > 0)
+                            {
+                                var clearSpecialEdge2 = new List<int>();
+                                for (var i = clearSpecialEdgeBlocks.Count - 1; i >= 0; --i)
+                                {
+                                    if (_itemList[clearSpecialEdgeBlocks[i]] != null &&
+                                        _itemList[clearSpecialEdgeBlocks[i]].GetComponent<BlockItem>().IsSpecial())
+                                    {
+                                        var itemScript = _itemList[clearSpecialEdgeBlocks[i]]
+                                            .GetComponent<BlockItem>();
+                                        switch (itemScript.GetSpecial())
+                                        {
+                                            case (int)Blocks.Special.Rainbow:
+                                                clearSpecialEdge2.AddRange(
+                                                    Blocks.ClearSpecialEdgeBlocks(_itemList[clearSpecialEdgeBlocks[i]]
+                                                        .GetComponent<BlockItem>().GetData()));
+                                                break;
+                                            case (int)Blocks.Special.Bronze:
+                                                if (clearSpecialEdgeBlocksBronze == null)
+                                                {
+                                                    clearSpecialEdgeBlocksBronze = new List<int>();
+                                                }
+
+                                                clearSpecialEdgeBlocksBronze.AddRange(
+                                                    Blocks.SplitSpecialEdgeBlocks(itemScript.GetData(),
+                                                        out var tmpNewBlocks, out var tmpEdgeToNew));
+
+                                                if (newBlocks == null)
+                                                {
+                                                    newBlocks = new List<int[]>();
+                                                }
+
+                                                newBlocks.AddRange(tmpNewBlocks);
+
+                                                if (specialEdgeBronzeToNew == null)
+                                                {
+                                                    specialEdgeBronzeToNew = new Dictionary<int, List<int[]>>();
+                                                }
+
+                                                specialEdgeBronzeToNew.Add(itemScript.GetPosIndex(), tmpEdgeToNew);
+                                                break;
+                                            case (int)Blocks.Special.Gold:
+                                                isSpecialGold = true;
+                                                specialGoldItem = _itemList[clearSpecialEdgeBlocks[i]];
+                                                break;
+                                        }
+
+                                        tmpSpecialEdge.Add(clearSpecialEdgeBlocks[i]);
+                                        clearSpecialEdgeBlocks.RemoveAt(i);
+                                    }
                                 }
-                                clearSpecialEdgeBlocks.AddRange(tmpSpecialEdge);
+
+                                clearSpecialEdgeBlocks.AddRange(clearSpecialEdge2);
                             }
 
-                                                     
-                            if (previousBlocks == "" && isSpecialGold)
-                            {
-                                if (!Constant.SpecialGoldAdClear || Blocks.IsTesting())
-                                {
-                                    MoveEnd(null, Constant.PreviousBlocks, true);
-                                    return;
-                                }
+                            clearSpecialEdgeBlocks.AddRange(tmpSpecialEdge);
+                        }
 
-                                if (specialGoldItem != null)
-                                {
-                                    StartCoroutine(Delay.Run(() =>
+
+                        if (previousBlocks == "" && isSpecialGold)
+                        {
+                            if (!Constant.SpecialGoldAdClear || Blocks.IsTesting())
+                            {
+                                MoveEnd(null, Constant.PreviousBlocks, true);
+                                return;
+                            }
+
+                            if (specialGoldItem != null)
+                            {
+                                StartCoroutine(Delay.Run(() =>
                                     {
                                         Constant.EffCtrlScript.ShowClearSpecialEdgeEff(specialGoldItem);
                                         Constant.EffCtrlScript.RemoveSpecialEffGoldCountDown(specialGoldItem);
                                     },
                                     Constant.ClearWaitTime));
-                                }
-
-                                StartCoroutine(Delay.Run(() =>
-                                {
-                                    if (Blocks.IsTesting())
-                                    {
-                                        MoveEnd(null, Constant.PreviousBlocks, true);
-                                    }
-                                    else
-                                    {
-                                        var pos = specialGoldItem.transform.localPosition + specialGoldItem.transform.Find("img").transform.localPosition;
-                                        ShowSpecialGoldDialog(pos);
-                                    }
-                                }, 1f));
-                                return;
                             }
 
-                            var clearWaitTime = Constant.ClearWaitTime;
-                            var effWaitTime = 0f;
-
-                            List<int> clearSpecialEdgeBlocksGold = null;
-                            List<int> specialGoldEffSplitBlocks = null;
-                            List<int[]> specialGoldEffSplitBlocksNew = null;
-                            List<int[]> specialGoldEffSplitEdgeToNew = null;
-                            if (previousBlocks != "" && isSpecialGold && specialGoldSuccess)
+                            StartCoroutine(Delay.Run(() =>
                             {
-                                Constant.GameStatusData.SpecialGoldShake++;
-                                var specialGoldEffType = Blocks.GetSpecialGoldEffType();
-                                switch (specialGoldEffType)
+                                if (Blocks.IsTesting())
                                 {
-                                    case (int)Blocks.SpecialGoldEffType.Color:
-                                        clearSpecialEdgeBlocksGold = Blocks.ClearColorBlocks();
-                                        break;
-                                    case (int)Blocks.SpecialGoldEffType.Split43:
-                                        Blocks.SplitB421(out specialGoldEffSplitBlocks, out specialGoldEffSplitBlocksNew, out specialGoldEffSplitEdgeToNew);
-                                        break;
-                                    case (int)Blocks.SpecialGoldEffType.NoNewBlocks:
-                                        _specialGoldEffNoNewBlocksTime = Constant.SpecialGoldEffNoNewBlocksTime;
-                                        break;
+                                    MoveEnd(null, Constant.PreviousBlocks, true);
                                 }
+                                else
+                                {
+                                    var pos = specialGoldItem.transform.localPosition +
+                                              specialGoldItem.transform.Find("img").transform.localPosition;
+                                    ShowSpecialGoldDialog(pos);
+                                }
+                            }, 1f));
+                            return;
+                        }
 
-                                if (specialGoldItem != null && !Blocks.IsTesting())
-                                {
-                                    Constant.EffCtrlScript.ShowClearSpecialEdgeEff(specialGoldItem);
-                                    if (Constant.SceneVersion == "2")
-                                    {
-                                        clearWaitTime += 0.5f;
-                                        effWaitTime += 0.5f;
-                                    }
-                                }
+                        var clearWaitTime = Constant.ClearWaitTime;
+                        var effWaitTime = 0f;
+
+                        List<int> clearSpecialEdgeBlocksGold = null;
+                        List<int> specialGoldEffSplitBlocks = null;
+                        List<int[]> specialGoldEffSplitBlocksNew = null;
+                        List<int[]> specialGoldEffSplitEdgeToNew = null;
+                        if (previousBlocks != "" && isSpecialGold && specialGoldSuccess)
+                        {
+                            Constant.GameStatusData.SpecialGoldShake++;
+                            var specialGoldEffType = Blocks.GetSpecialGoldEffType();
+                            switch (specialGoldEffType)
+                            {
+                                case (int)Blocks.SpecialGoldEffType.Color:
+                                    clearSpecialEdgeBlocksGold = Blocks.ClearColorBlocks();
+                                    break;
+                                case (int)Blocks.SpecialGoldEffType.Split43:
+                                    Blocks.SplitB421(out specialGoldEffSplitBlocks, out specialGoldEffSplitBlocksNew,
+                                        out specialGoldEffSplitEdgeToNew);
+                                    break;
+                                case (int)Blocks.SpecialGoldEffType.NoNewBlocks:
+                                    _specialGoldEffNoNewBlocksTime = Constant.SpecialGoldEffNoNewBlocksTime;
+                                    break;
                             }
 
-                            if (clearSpecialBlocks.Count > 0)
+                            if (specialGoldItem != null && !Blocks.IsTesting())
                             {
+                                Constant.EffCtrlScript.ShowClearSpecialEdgeEff(specialGoldItem);
                                 if (Constant.SceneVersion == "2")
                                 {
-                                    if (clearSpecialEdgeBlocksGold != null && clearSpecialEdgeBlocksGold.Count > 0)
+                                    clearWaitTime += 0.5f;
+                                    effWaitTime += 0.5f;
+                                }
+                            }
+                        }
+
+                        if (clearSpecialBlocks.Count > 0)
+                        {
+                            if (Constant.SceneVersion == "2")
+                            {
+                                if (clearSpecialEdgeBlocksGold != null && clearSpecialEdgeBlocksGold.Count > 0)
+                                {
+                                    clearWaitTime += Constant.SpecialGoldClearTime +
+                                                     clearSpecialEdgeBlocksGold.Count *
+                                                     Constant.SpecialGoldClearIntervalTime;
+                                }
+                                else if (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0)
+                                {
+                                    clearWaitTime += Constant.SpecialClearTime - 0.5f;
+                                }
+                            }
+                            else if (Constant.SceneVersion == "3")
+                            {
+                                var bronzeTime = 0f;
+                                var goldTime = 0f;
+                                if (clearSpecialEdgeBlocksGold != null && clearSpecialEdgeBlocksGold.Count > 0)
+                                {
+                                    goldTime += Constant.SpecialGoldClearTime +
+                                                clearSpecialEdgeBlocksGold.Count *
+                                                Constant.SpecialGoldClearIntervalTime;
+                                }
+                                else if (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0)
+                                {
+                                    bronzeTime += Constant.SpecialClearTime + 0.2f;
+                                }
+
+                                clearWaitTime += Math.Max(goldTime, bronzeTime);
+                            }
+
+                            clearWaitTime += Constant.SpecialClearTime;
+
+                            StartCoroutine(Delay.Run(() =>
+                            {
+                                foreach (var specialData in clearSpecialBlocks)
+                                {
+                                    if (specialData[(int)Blocks.Key.Special] == (int)Blocks.Special.Rainbow)
                                     {
-                                        clearWaitTime += Constant.SpecialGoldClearTime +
-                                                         clearSpecialEdgeBlocksGold.Count * Constant.SpecialGoldClearIntervalTime;
-                                    }
-                                    else if (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0)
-                                    {
-                                        clearWaitTime += Constant.SpecialClearTime - 0.5f;
+                                        Constant.EffCtrlScript.ShowClearSpecialEff(
+                                            _itemList[specialData[(int)Blocks.Key.Pos]]);
                                     }
                                 }
-                                else if (Constant.SceneVersion == "3")
+
+                                ManagerAudio.PlaySound("thunder");
+
+
+                                if (clearSpecialEdgeBlocks.Count > 0)
                                 {
-                                    var bronzeTime = 0f;
-                                    var goldTime = 0f;
-                                    if (clearSpecialEdgeBlocksGold != null && clearSpecialEdgeBlocksGold.Count > 0)
+                                    foreach (var posIndex in clearSpecialEdgeBlocks)
                                     {
-                                        goldTime += Constant.SpecialGoldClearTime +
-                                                         clearSpecialEdgeBlocksGold.Count * Constant.SpecialGoldClearIntervalTime;
-                                    }
-                                    else if (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0)
-                                    {
-                                        bronzeTime += Constant.SpecialClearTime + 0.2f;
-                                    }
-
-                                    clearWaitTime += Math.Max(goldTime, bronzeTime);
-                                }
-
-                                clearWaitTime += Constant.SpecialClearTime;
-
-                                StartCoroutine(Delay.Run(() =>
-                                {
-                                    foreach (var specialData in clearSpecialBlocks)
-                                    {
-                                        if (specialData[(int)Blocks.Key.Special] == (int)Blocks.Special.Rainbow)
+                                        if (_itemList[posIndex] != null)
                                         {
-                                         
-                                            Constant.EffCtrlScript.ShowClearSpecialEff(_itemList[specialData[(int)Blocks.Key.Pos]]);
-                                        }
-                                    }
-
-                                    ManagerAudio.PlaySound("thunder");
-
-                                  
-                                    if (clearSpecialEdgeBlocks.Count > 0)
-                                    {
-                                        foreach (var posIndex in clearSpecialEdgeBlocks)
-                                        {
-                                            if (_itemList[posIndex] != null)
+                                            if (_itemList[posIndex].GetComponent<BlockItem>().IsSpecial())
                                             {
-                                                if (_itemList[posIndex].GetComponent<BlockItem>().IsSpecial())
+                                                if (_itemList[posIndex].GetComponent<BlockItem>().GetSpecial() ==
+                                                    (int)Blocks.Special.Rainbow)
                                                 {
-                                                    if (_itemList[posIndex].GetComponent<BlockItem>().GetSpecial() ==
-                                                        (int)Blocks.Special.Rainbow)
-                                                    {
-                                                        Constant.EffCtrlScript.ShowClearSpecialEff(_itemList[posIndex]);
-                                                    }
+                                                    Constant.EffCtrlScript.ShowClearSpecialEff(_itemList[posIndex]);
                                                 }
-                                                else
-                                                {
-                                                    Constant.EffCtrlScript.ShowClearSpecialEdgeEff(_itemList[posIndex]);
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                  
-                                    if (specialEdgeBronzeToNew != null)
-                                    {
-                                        foreach (var item in specialEdgeBronzeToNew)
-                                        {
-                                         
-                                            if (goldToBronzePosIndex != -1 && goldToBronzePosIndex == item.Key)
-                                            {
-                                                //do nothing
                                             }
                                             else
                                             {
-                                                ++Constant.GameStatusData.SpecialBronze;
-                                            }
-                                            Constant.EffCtrlScript.ShowClearSpecialEffBronze(item.Key, item.Value);
-                                        }
-                                    }
-
-                                  
-                                    if (specialGoldItem != null && _specialGoldEffNoNewBlocksTime > 0)
-                                    {
-                                        ++Constant.GameStatusData.SpecialGold;
-                                        if (specialGoldItem != null)
-                                        {
-                                            Constant.EffCtrlScript.ShowClearSpecialEffGoldOnly(specialGoldItem);
-
-                                            if (Constant.VibratorSwitch)
-                                            {
-                                                Tools.DoVibrator(Constant.VibratorTime, Constant.VibratorAmplitude);
+                                                Constant.EffCtrlScript.ShowClearSpecialEdgeEff(_itemList[posIndex]);
                                             }
                                         }
                                     }
+                                }
 
-                                  
-                                    if (specialGoldEffSplitEdgeToNew != null && specialGoldItem != null)
-                                    {
-                                        ++Constant.GameStatusData.SpecialGold;
-                                        Constant.EffCtrlScript.ShowClearSpecialEffGoldSplit(specialGoldItem.GetComponent<BlockItem>().GetPosIndex(), specialGoldEffSplitEdgeToNew);
 
-                                        if (Constant.VibratorSwitch)
-                                        {
-                                            Tools.DoVibrator(Constant.VibratorTime, Constant.VibratorAmplitude);
-                                        }
-                                    }
-
-                                   
-                                    if (clearSpecialEdgeBlocksGold != null && clearSpecialEdgeBlocksGold.Count > 0)
-                                    {
-                                        foreach (var specialData in clearSpecialBlocks)
-                                        {
-                                            if (specialData[(int)Blocks.Key.Special] == (int)Blocks.Special.Gold)
-                                            {
-                                                ++Constant.GameStatusData.SpecialGold;
-                                                Constant.EffCtrlScript.ShowClearSpecialEffGold(
-                                                    specialData[(int)Blocks.Key.Pos], clearSpecialEdgeBlocksGold);
-                                                break;
-                                            }
-                                        }
-
-                                        foreach (var posIndex in clearSpecialEdgeBlocks)
-                                        {
-                                            if (_itemList[posIndex] != null &&
-                                                _itemList[posIndex].GetComponent<BlockItem>().GetSpecial() ==
-                                                (int)Blocks.Special.Gold)
-                                            {
-                                                Constant.EffCtrlScript.ShowClearSpecialEffGold(posIndex, clearSpecialEdgeBlocksGold);
-                                                break;
-                                            }
-                                        }
-
-                                        if (Constant.VibratorSwitch)
-                                        {
-                                            Tools.DoVibrator(Constant.VibratorTime, Constant.VibratorAmplitude);
-                                        }
-                                    }
-                                }, Constant.ClearWaitTime + effWaitTime));
-                            }
-
-                            if (Player.IsInGuide() || (Blocks.IsTesting() && Blocks.GetBlocksTest().ShouldShowClearHangEff()))
-                            {
-                                clearWaitTime += Constant.SecondChanceClearEffTime + 0.4f;
-
-                                StartCoroutine(Delay.Run(() =>
+                                if (specialEdgeBronzeToNew != null)
                                 {
-                                    foreach (var hang in clearHang)
+                                    foreach (var item in specialEdgeBronzeToNew)
                                     {
-                                        Constant.EffCtrlScript.ShowSecondChanceClearHangEff(null, hang);
-                                        for (var i = hang * Constant.Lie; i < (hang + 1) * Constant.Lie; ++i)
+                                        if (goldToBronzePosIndex != -1 && goldToBronzePosIndex == item.Key)
                                         {
-                                            if (_itemList[i] != null)
-                                            {
-                                                Constant.EffCtrlScript.ShowClearSpecialEdgeEff(_itemList[i]);
-                                            }
+                                            //do nothing
                                         }
-                                        Constant.GameStatusData.RemoveShake++;
-                                        if (shouldVibrator)
+                                        else
                                         {
+                                            ++Constant.GameStatusData.SpecialBronze;
+                                        }
+
+                                        Constant.EffCtrlScript.ShowClearSpecialEffBronze(item.Key, item.Value);
+                                    }
+                                }
+
+
+                                if (specialGoldItem != null && _specialGoldEffNoNewBlocksTime > 0)
+                                {
+                                    ++Constant.GameStatusData.SpecialGold;
+                                    if (specialGoldItem != null)
+                                    {
+                                        Constant.EffCtrlScript.ShowClearSpecialEffGoldOnly(specialGoldItem);
+
+                                        if (Constant.VibratorSwitch)
+                                        {
+                                            Tools.DoVibrator(Constant.VibratorTime, Constant.VibratorAmplitude);
+                                        }
+                                    }
+                                }
+
+
+                                if (specialGoldEffSplitEdgeToNew != null && specialGoldItem != null)
+                                {
+                                    ++Constant.GameStatusData.SpecialGold;
+                                    Constant.EffCtrlScript.ShowClearSpecialEffGoldSplit(
+                                        specialGoldItem.GetComponent<BlockItem>().GetPosIndex(),
+                                        specialGoldEffSplitEdgeToNew);
+
+                                    if (Constant.VibratorSwitch)
+                                    {
+                                        Tools.DoVibrator(Constant.VibratorTime, Constant.VibratorAmplitude);
+                                    }
+                                }
+
+
+                                if (clearSpecialEdgeBlocksGold != null && clearSpecialEdgeBlocksGold.Count > 0)
+                                {
+                                    foreach (var specialData in clearSpecialBlocks)
+                                    {
+                                        if (specialData[(int)Blocks.Key.Special] == (int)Blocks.Special.Gold)
+                                        {
+                                            ++Constant.GameStatusData.SpecialGold;
+                                            Constant.EffCtrlScript.ShowClearSpecialEffGold(
+                                                specialData[(int)Blocks.Key.Pos], clearSpecialEdgeBlocksGold);
+                                            break;
                                         }
                                     }
 
-                                    if (clearHang.Count > 1)
+                                    foreach (var posIndex in clearSpecialEdgeBlocks)
                                     {
-                                        Constant.GameStatusData.ComboShake++;
+                                        if (_itemList[posIndex] != null &&
+                                            _itemList[posIndex].GetComponent<BlockItem>().GetSpecial() ==
+                                            (int)Blocks.Special.Gold)
+                                        {
+                                            Constant.EffCtrlScript.ShowClearSpecialEffGold(posIndex,
+                                                clearSpecialEdgeBlocksGold);
+                                            break;
+                                        }
                                     }
-                                }, 0.2f));
-                            }
 
-                            if (!Player.IsInGuide() && Constant.SceneVersion == "3")
+                                    if (Constant.VibratorSwitch)
+                                    {
+                                        Tools.DoVibrator(Constant.VibratorTime, Constant.VibratorAmplitude);
+                                    }
+                                }
+                            }, Constant.ClearWaitTime + effWaitTime));
+                        }
+
+                        if (Player.IsInGuide() ||
+                            (Blocks.IsTesting() && Blocks.GetBlocksTest().ShouldShowClearHangEff()))
+                        {
+                            clearWaitTime += Constant.SecondChanceClearEffTime + 0.4f;
+
+                            StartCoroutine(Delay.Run(() =>
                             {
                                 foreach (var hang in clearHang)
                                 {
+                                    Constant.EffCtrlScript.ShowSecondChanceClearHangEff(null, hang);
                                     for (var i = hang * Constant.Lie; i < (hang + 1) * Constant.Lie; ++i)
                                     {
                                         if (_itemList[i] != null)
                                         {
-                                            Constant.EffCtrlScript.ShowClearSpecialEdgeEff(_itemList[i], 0.02f, 70 / 255f);
+                                            Constant.EffCtrlScript.ShowClearSpecialEdgeEff(_itemList[i]);
                                         }
                                     }
+
                                     Constant.GameStatusData.RemoveShake++;
                                     if (shouldVibrator)
                                     {
                                     }
                                 }
+
                                 if (clearHang.Count > 1)
                                 {
                                     Constant.GameStatusData.ComboShake++;
                                 }
-                            }
+                            }, 0.2f));
+                        }
 
-                           
-                            if (Constant.SceneVersion == "3")
+                        if (!Player.IsInGuide() && Constant.SceneVersion == "3")
+                        {
+                            foreach (var hang in clearHang)
                             {
-                                StartCoroutine(Delay.Run(() =>
+                                for (var i = hang * Constant.Lie; i < (hang + 1) * Constant.Lie; ++i)
                                 {
-                                    var isClearGold = clearSpecialEdgeBlocksGold != null &&
-                                                      clearSpecialEdgeBlocksGold.Count > 0;
-
-                                    if (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0)
+                                    if (_itemList[i] != null)
                                     {
-                                        foreach (var i in clearSpecialEdgeBlocksBronze)
-                                        {
-                                            if (_itemList[i] != null)
-                                            {
-                                                var clearByGold = false;
-                                                if (isClearGold)
-                                                {
-                                                    foreach (var t in clearSpecialEdgeBlocksGold)
-                                                    {
-                                                        if (t == i)
-                                                        {
-                                                            clearByGold = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-
-                                                if (!clearByGold)
-                                                {
-                                                    RemoveBlockItemByIndex(i, false);
-                                                }
-                                            }
-                                        }
-
-                                        if (newBlocks != null && newBlocks.Count > 0)
-                                        {
-                                            foreach (var newData in newBlocks)
-                                            {
-                                                if (!Blocks.HaveBlock(newData[(int)Blocks.Key.Pos]))
-                                                {
-                                                    continue;
-                                                }
-
-                                              
-                                                if (_itemList[newData[(int)Blocks.Key.Pos]] != null)
-                                                {
-                                                    RemoveBlockItemByIndex(newData[(int)Blocks.Key.Pos], false);
-                                                }
-
-                                                var newItem = CreateBlockItem(newData);
-                                                newItem.SetActive(false);
-                                                StartCoroutine(Delay.Run(() =>
-                                                {
-                                                    newItem.SetActive(true);
-                                                }, 0.5f));
-                                            }
-                                        }
+                                        Constant.EffCtrlScript.ShowClearSpecialEdgeEff(_itemList[i], 0.02f, 70 / 255f);
                                     }
-                                }, clearWaitTime - 0.3f));
+                                }
+
+                                Constant.GameStatusData.RemoveShake++;
+                                if (shouldVibrator)
+                                {
+                                }
                             }
 
+                            if (clearHang.Count > 1)
+                            {
+                                Constant.GameStatusData.ComboShake++;
+                            }
+                        }
+
+
+                        if (Constant.SceneVersion == "3")
+                        {
                             StartCoroutine(Delay.Run(() =>
                             {
-                               
-                                var clearScore = 0;
-                                var iceBlockNum = 0;
-                                var doubleScore = 2;
-                                var doubleCombo = 0;
-                                foreach (var hang in clearHang)
+                                var isClearGold = clearSpecialEdgeBlocksGold != null &&
+                                                  clearSpecialEdgeBlocksGold.Count > 0;
+
+                                if (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0)
                                 {
-                                    if (Constant.LevelUpOtherEffSwitch)
-                                    {
-                                        Constant.EffCtrlScript.ShowClearToLevelEff(hang);
-                                    }
-
-                                    var isClearTypeB = false;
-                                    var isClearTypeB1 = false;
-                                    var isClearTypeB2 = false;
-
-                                    for (var i = hang * Constant.Lie; i < (hang + 1) * Constant.Lie; ++i)
+                                    foreach (var i in clearSpecialEdgeBlocksBronze)
                                     {
                                         if (_itemList[i] != null)
                                         {
-                                          
-                                            if (_itemList[i].GetComponent<BlockItem>().IsMovedBlockItem)
+                                            var clearByGold = false;
+                                            if (isClearGold)
                                             {
-                                                var offsetHang =
-                                                    Blocks.GetHangByPos(_itemList[i].GetComponent<BlockItem>()
-                                                        .GetPosIndex()) - _itemList[i].GetComponent<BlockItem>()
-                                                        .OriHang;
-                                                if (offsetHang == -1)
+                                                foreach (var t in clearSpecialEdgeBlocksGold)
                                                 {
-                                                    AddClearType("A1");
+                                                    if (t == i)
+                                                    {
+                                                        clearByGold = true;
+                                                        break;
+                                                    }
                                                 }
-                                                else if (offsetHang < -1)
-                                                {
-                                                    AddClearType("A2");
-                                                }
-                                                else if (offsetHang == 0)
-                                                {
-                                                    isClearTypeB = true;
-                                                }
-
-                                                _itemList[i].GetComponent<BlockItem>().IsMovedBlockItem = false;
-                                                _itemList[i].GetComponent<BlockItem>().OriHang = 0;
-                                                _itemList[i].GetComponent<BlockItem>().WillBeHangRemove = true;
-                                            }
-                                            else
-                                            {
-                                                if (_itemList[i].GetComponent<BlockItem>().LastDownOffsetY == -1)
-                                                {
-                                                    isClearTypeB1 = true;
-                                                }
-                                                else if (_itemList[i].GetComponent<BlockItem>().LastDownOffsetY < -1)
-                                                {
-                                                    isClearTypeB2 = true;
-                                                }
-
                                             }
 
-                                            var score = _itemList[i].GetComponent<BlockItem>().GetLength() *
-                                                        _unitBlockScore;
-                                            if (_itemList[i].GetComponent<BlockItem>().IsSpecial())
-                                            {
-                                                score *= Blocks.GetSpecialScoreTimesBySpecialType(_itemList[i].GetComponent<BlockItem>().GetSpecial());
-                                            }
-
-                                            score *= (int)Math.Pow(doubleScore, doubleCombo);
-                                            clearScore += score;
-
-                                            if (_itemList[i].GetComponent<BlockItem>().IsIce())
-                                            {
-                                                Constant.EffCtrlScript.ShowClearIceEff(_itemList[i]);
-                                                Constant.EffCtrlScript.RemoveIceEff(_itemList[i]);
-                                                ++iceBlockNum;
-                                            }
-                                            else
-                                            {
-                                                Constant.EffCtrlScript.ShowClearBlockEff(_itemList[i]);
-                                                RemoveBlockItemByIndex(i);
-                                            }
-                                        }
-                                    }
-
-                                    if (isClearTypeB)
-                                    {
-                                        if (isClearTypeB1)
-                                        {
-                                            AddClearType("B1");
-                                        }
-
-                                        if (isClearTypeB2)
-                                        {
-                                            AddClearType("B2");
-                                        }
-                                    }
-
-                                    ++_clearCombo;
-                                    ++doubleCombo;
-                                }
-
-                                if (Constant.SceneVersion == "2")
-                                {
-                                  
-                                    if (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0)
-                                    {
-                                        foreach (var i in clearSpecialEdgeBlocksBronze)
-                                        {
-                                            if (_itemList[i] != null)
+                                            if (!clearByGold)
                                             {
                                                 RemoveBlockItemByIndex(i, false);
                                             }
                                         }
+                                    }
 
-                                        if (newBlocks != null && newBlocks.Count > 0)
+                                    if (newBlocks != null && newBlocks.Count > 0)
+                                    {
+                                        foreach (var newData in newBlocks)
                                         {
-                                            foreach (var newData in newBlocks)
+                                            if (!Blocks.HaveBlock(newData[(int)Blocks.Key.Pos]))
                                             {
-                                                
-                                                if (_itemList[newData[(int)Blocks.Key.Pos]] != null)
-                                                {
-                                                    RemoveBlockItemByIndex(newData[(int)Blocks.Key.Pos], false);
-                                                }
-                                                CreateBlockItem(newData);
+                                                continue;
                                             }
+
+
+                                            if (_itemList[newData[(int)Blocks.Key.Pos]] != null)
+                                            {
+                                                RemoveBlockItemByIndex(newData[(int)Blocks.Key.Pos], false);
+                                            }
+
+                                            var newItem = CreateBlockItem(newData);
+                                            newItem.SetActive(false);
+                                            StartCoroutine(Delay.Run(() => { newItem.SetActive(true); }, 0.5f));
+                                        }
+                                    }
+                                }
+                            }, clearWaitTime - 0.3f));
+                        }
+
+                        StartCoroutine(Delay.Run(() =>
+                        {
+                            var clearScore = 0;
+                            var iceBlockNum = 0;
+                            var doubleScore = 2;
+                            var doubleCombo = 0;
+                            foreach (var hang in clearHang)
+                            {
+                                if (Constant.LevelUpOtherEffSwitch)
+                                {
+                                    Constant.EffCtrlScript.ShowClearToLevelEff(hang);
+                                }
+
+                                var isClearTypeB = false;
+                                var isClearTypeB1 = false;
+                                var isClearTypeB2 = false;
+
+                                for (var i = hang * Constant.Lie; i < (hang + 1) * Constant.Lie; ++i)
+                                {
+                                    if (_itemList[i] != null)
+                                    {
+                                        if (_itemList[i].GetComponent<BlockItem>().IsMovedBlockItem)
+                                        {
+                                            var offsetHang =
+                                                Blocks.GetHangByPos(_itemList[i].GetComponent<BlockItem>()
+                                                    .GetPosIndex()) - _itemList[i].GetComponent<BlockItem>()
+                                                    .OriHang;
+                                            if (offsetHang == -1)
+                                            {
+                                                AddClearType("A1");
+                                            }
+                                            else if (offsetHang < -1)
+                                            {
+                                                AddClearType("A2");
+                                            }
+                                            else if (offsetHang == 0)
+                                            {
+                                                isClearTypeB = true;
+                                            }
+
+                                            _itemList[i].GetComponent<BlockItem>().IsMovedBlockItem = false;
+                                            _itemList[i].GetComponent<BlockItem>().OriHang = 0;
+                                            _itemList[i].GetComponent<BlockItem>().WillBeHangRemove = true;
+                                        }
+                                        else
+                                        {
+                                            if (_itemList[i].GetComponent<BlockItem>().LastDownOffsetY == -1)
+                                            {
+                                                isClearTypeB1 = true;
+                                            }
+                                            else if (_itemList[i].GetComponent<BlockItem>().LastDownOffsetY < -1)
+                                            {
+                                                isClearTypeB2 = true;
+                                            }
+                                        }
+
+                                        var score = _itemList[i].GetComponent<BlockItem>().GetLength() *
+                                                    _unitBlockScore;
+                                        if (_itemList[i].GetComponent<BlockItem>().IsSpecial())
+                                        {
+                                            score *= Blocks.GetSpecialScoreTimesBySpecialType(_itemList[i]
+                                                .GetComponent<BlockItem>().GetSpecial());
+                                        }
+
+                                        score *= (int)Math.Pow(doubleScore, doubleCombo);
+                                        clearScore += score;
+
+                                        if (_itemList[i].GetComponent<BlockItem>().IsIce())
+                                        {
+                                            Constant.EffCtrlScript.ShowClearIceEff(_itemList[i]);
+                                            Constant.EffCtrlScript.RemoveIceEff(_itemList[i]);
+                                            ++iceBlockNum;
+                                        }
+                                        else
+                                        {
+                                            Constant.EffCtrlScript.ShowClearBlockEff(_itemList[i]);
+                                            RemoveBlockItemByIndex(i);
                                         }
                                     }
                                 }
 
-                               
-                                if (specialGoldEffSplitBlocks != null && specialGoldEffSplitBlocks.Count > 0)
+                                if (isClearTypeB)
                                 {
-                                    foreach (var i in specialGoldEffSplitBlocks)
+                                    if (isClearTypeB1)
+                                    {
+                                        AddClearType("B1");
+                                    }
+
+                                    if (isClearTypeB2)
+                                    {
+                                        AddClearType("B2");
+                                    }
+                                }
+
+                                ++_clearCombo;
+                                ++doubleCombo;
+                            }
+
+                            if (Constant.SceneVersion == "2")
+                            {
+                                if (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0)
+                                {
+                                    foreach (var i in clearSpecialEdgeBlocksBronze)
                                     {
                                         if (_itemList[i] != null)
                                         {
@@ -1109,175 +1122,202 @@ namespace UI
                                         }
                                     }
 
-                                    if (specialGoldEffSplitBlocksNew != null)
+                                    if (newBlocks != null && newBlocks.Count > 0)
                                     {
-                                        foreach (var newData in specialGoldEffSplitBlocksNew)
+                                        foreach (var newData in newBlocks)
                                         {
+                                            if (_itemList[newData[(int)Blocks.Key.Pos]] != null)
+                                            {
+                                                RemoveBlockItemByIndex(newData[(int)Blocks.Key.Pos], false);
+                                            }
+
                                             CreateBlockItem(newData);
                                         }
                                     }
                                 }
+                            }
 
-                               
-                                if (clearSpecialEdgeBlocks.Count > 0)
+
+                            if (specialGoldEffSplitBlocks != null && specialGoldEffSplitBlocks.Count > 0)
+                            {
+                                foreach (var i in specialGoldEffSplitBlocks)
                                 {
-                                    foreach (var i in clearSpecialEdgeBlocks)
+                                    if (_itemList[i] != null)
                                     {
-                                        if (_itemList[i] != null)
-                                        {
-                                            var score = _itemList[i].GetComponent<BlockItem>().GetLength() *
-                                                        _unitBlockScore;
-                                            if (_itemList[i].GetComponent<BlockItem>().IsSpecial())
-                                            {
-                                                score *= Blocks.GetSpecialScoreTimesBySpecialType(_itemList[i].GetComponent<BlockItem>().GetSpecial());
-                                            }
-                                            clearScore += score;
-
-                                            if (_itemList[i].GetComponent<BlockItem>().IsIce())
-                                            {
-                                                Constant.EffCtrlScript.ShowClearIceEff(_itemList[i]);
-                                                Constant.EffCtrlScript.RemoveIceEff(_itemList[i]);
-                                                ++iceBlockNum;
-                                            }
-                                            else
-                                            {
-                                                Constant.EffCtrlScript.ShowClearBlockEff(_itemList[i]);
-                                                RemoveBlockItemByIndex(i);
-                                            }
-                                        }
+                                        RemoveBlockItemByIndex(i, false);
                                     }
                                 }
 
-                               
-                                if (clearSpecialEdgeBlocksGold != null && clearSpecialEdgeBlocksGold.Count > 0)
+                                if (specialGoldEffSplitBlocksNew != null)
                                 {
-                                    foreach (var i in clearSpecialEdgeBlocksGold)
+                                    foreach (var newData in specialGoldEffSplitBlocksNew)
                                     {
-                                        if (_itemList[i] != null)
-                                        {
-                                            var score = _itemList[i].GetComponent<BlockItem>().GetLength() *
-                                                        _unitBlockScore;
-                                            if (_itemList[i].GetComponent<BlockItem>().IsSpecial())
-                                            {
-                                                score *= Blocks.GetSpecialScoreTimesBySpecialType(_itemList[i].GetComponent<BlockItem>().GetSpecial());
-                                            }
-                                            clearScore += score;
-
-                                            if (_itemList[i].GetComponent<BlockItem>().IsIce())
-                                            {
-                                                Constant.EffCtrlScript.ShowClearIceEff(_itemList[i]);
-                                                Constant.EffCtrlScript.RemoveIceEff(_itemList[i]);
-                                                ++iceBlockNum;
-                                            }
-                                            else
-                                            {
-                                                Constant.EffCtrlScript.ShowClearBlockEff(_itemList[i]);
-                                                RemoveBlockItemByIndex(i);
-                                            }
-                                        }
+                                        CreateBlockItem(newData);
                                     }
-
-                                    Constant.EffCtrlScript.RemoveClearSpecialEffGoldFaDianEff();
                                 }
+                            }
 
-                                ++_clearComboSound;
-                                if (_clearComboSound + 1 >= 6)
-                                {
-                                    ManagerAudio.PlaySound("clear_6");
-                                }
-                                else
-                                {
-                                    ManagerAudio.PlaySound("clear_" + (_clearComboSound + 1));
-                                }
 
-                                if (clearScore > 0)
+                            if (clearSpecialEdgeBlocks.Count > 0)
+                            {
+                                foreach (var i in clearSpecialEdgeBlocks)
                                 {
-                                    if (_clearCombo > 0)
+                                    if (_itemList[i] != null)
                                     {
-                                        Constant.EffCtrlScript.ShowComboEff(_clearCombo);
-
-                                        var shouldShowAchievementTip = false;
-                                        if (_clearCombo == 2 && !Constant.GameStatusData.Combo2Tip && !Player.IsInGuide())
+                                        var score = _itemList[i].GetComponent<BlockItem>().GetLength() *
+                                                    _unitBlockScore;
+                                        if (_itemList[i].GetComponent<BlockItem>().IsSpecial())
                                         {
-                                            
-                                            Constant.GameStatusData.Combo2Tip = true;
-                                            shouldShowAchievementTip = true;
+                                            score *= Blocks.GetSpecialScoreTimesBySpecialType(_itemList[i]
+                                                .GetComponent<BlockItem>().GetSpecial());
                                         }
 
-                                        if (_clearCombo == 4 && !Constant.GameStatusData.Combo4Tip)
+                                        clearScore += score;
+
+                                        if (_itemList[i].GetComponent<BlockItem>().IsIce())
                                         {
-                                            Constant.GameStatusData.Combo2Tip = true;
-                                            Constant.GameStatusData.Combo4Tip = true;
-                                            shouldShowAchievementTip = true;
-                                        }
-
-                                        if (_clearCombo == 7 && !Constant.GameStatusData.Combo7Tip)
-                                        {
-                                            Constant.GameStatusData.Combo2Tip = true;
-                                            Constant.GameStatusData.Combo4Tip = true;
-                                            Constant.GameStatusData.Combo7Tip = true;
-                                            shouldShowAchievementTip = true;
-                                        }
-
-                                        if (shouldShowAchievementTip)
-                                        {
-                                            Constant.AchievementScript.AddAchievementTip("COMBO TIMES", _clearCombo);
-                                        }
-                                    }
-
-                                    Constant.EffCtrlScript.ShowScoreEff(clearScore, iceBlockNum);
-                                }
-
-                                if (iceBlockNum > 0)
-                                {
-                                    clearScore *= (int)Math.Pow(2, iceBlockNum);
-                                    Constant.GameStatusData.RemoveFrozen += iceBlockNum;
-                                }
-                                Player.SetCurScore(Player.GetCurScore() + clearScore);
-                                StartCoroutine(Delay.Run(() =>
-                                {
-                                    UpdateScoreUi();
-                                }, Constant.ScoreUpdateDelayTime));
-
-
-                                if (_movedBlockItem != null)
-                                {
-                                    if (_clearCombo == 0)
-                                    {
-                                        if (!_movedBlockItem.GetComponent<BlockItem>().WillBeHangRemove)
-                                        {
-                                            AddClearType("C", 1);
-                                        }
-                                    }
-                                    else if (_clearCombo > 0)
-                                    {
-                                        if (_movedBlockItem.GetComponent<BlockItem>().WillBeHangRemove)
-                                        {
-                                            AddClearType("C", _clearCombo);
+                                            Constant.EffCtrlScript.ShowClearIceEff(_itemList[i]);
+                                            Constant.EffCtrlScript.RemoveIceEff(_itemList[i]);
+                                            ++iceBlockNum;
                                         }
                                         else
                                         {
-                                            AddClearType("C", _clearCombo + 1);
+                                            Constant.EffCtrlScript.ShowClearBlockEff(_itemList[i]);
+                                            RemoveBlockItemByIndex(i);
+                                        }
+                                    }
+                                }
+                            }
+
+
+                            if (clearSpecialEdgeBlocksGold != null && clearSpecialEdgeBlocksGold.Count > 0)
+                            {
+                                foreach (var i in clearSpecialEdgeBlocksGold)
+                                {
+                                    if (_itemList[i] != null)
+                                    {
+                                        var score = _itemList[i].GetComponent<BlockItem>().GetLength() *
+                                                    _unitBlockScore;
+                                        if (_itemList[i].GetComponent<BlockItem>().IsSpecial())
+                                        {
+                                            score *= Blocks.GetSpecialScoreTimesBySpecialType(_itemList[i]
+                                                .GetComponent<BlockItem>().GetSpecial());
+                                        }
+
+                                        clearScore += score;
+
+                                        if (_itemList[i].GetComponent<BlockItem>().IsIce())
+                                        {
+                                            Constant.EffCtrlScript.ShowClearIceEff(_itemList[i]);
+                                            Constant.EffCtrlScript.RemoveIceEff(_itemList[i]);
+                                            ++iceBlockNum;
+                                        }
+                                        else
+                                        {
+                                            Constant.EffCtrlScript.ShowClearBlockEff(_itemList[i]);
+                                            RemoveBlockItemByIndex(i);
                                         }
                                     }
                                 }
 
-                                var nextMoveEndWaitTime = Constant.DownEndWaitTime;
-                                if (clearSpecialEdgeBlocks.Count > 0 || (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0) || isSpecialGold)
+                                Constant.EffCtrlScript.RemoveClearSpecialEffGoldFaDianEff();
+                            }
+
+                            ++_clearComboSound;
+                            if (_clearComboSound + 1 >= 6)
+                            {
+                                ManagerAudio.PlaySound("clear_6");
+                            }
+                            else
+                            {
+                                ManagerAudio.PlaySound("clear_" + (_clearComboSound + 1));
+                            }
+
+                            if (clearScore > 0)
+                            {
+                                if (_clearCombo > 0)
                                 {
-                                    nextMoveEndWaitTime += Constant.SpecialEdgeClearTime;
+                                    Constant.EffCtrlScript.ShowComboEff(_clearCombo);
+
+                                    var shouldShowAchievementTip = false;
+                                    if (_clearCombo == 2 && !Constant.GameStatusData.Combo2Tip && !Player.IsInGuide())
+                                    {
+                                        Constant.GameStatusData.Combo2Tip = true;
+                                        shouldShowAchievementTip = true;
+                                    }
+
+                                    if (_clearCombo == 4 && !Constant.GameStatusData.Combo4Tip)
+                                    {
+                                        Constant.GameStatusData.Combo2Tip = true;
+                                        Constant.GameStatusData.Combo4Tip = true;
+                                        shouldShowAchievementTip = true;
+                                    }
+
+                                    if (_clearCombo == 7 && !Constant.GameStatusData.Combo7Tip)
+                                    {
+                                        Constant.GameStatusData.Combo2Tip = true;
+                                        Constant.GameStatusData.Combo4Tip = true;
+                                        Constant.GameStatusData.Combo7Tip = true;
+                                        shouldShowAchievementTip = true;
+                                    }
+
+                                    if (shouldShowAchievementTip)
+                                    {
+                                        Constant.AchievementScript.AddAchievementTip("COMBO TIMES", _clearCombo);
+                                    }
                                 }
-                                StartCoroutine(Delay.Run(() =>
+
+                                Constant.EffCtrlScript.ShowScoreEff(clearScore, iceBlockNum);
+                            }
+
+                            if (iceBlockNum > 0)
+                            {
+                                clearScore *= (int)Math.Pow(2, iceBlockNum);
+                                Constant.GameStatusData.RemoveFrozen += iceBlockNum;
+                            }
+
+                            Player.SetCurScore(Player.GetCurScore() + clearScore);
+                            StartCoroutine(Delay.Run(() => { UpdateScoreUi(); }, Constant.ScoreUpdateDelayTime));
+
+
+                            if (_movedBlockItem != null)
+                            {
+                                if (_clearCombo == 0)
                                 {
-                                    MoveEnd();
-                                }, nextMoveEndWaitTime));
-                            }, clearWaitTime));
-                        }
-                        else
-                        {
-                            StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.1f));
-                        }
-                    }, Constant.DownAnimTime + 0.01f));
+                                    if (!_movedBlockItem.GetComponent<BlockItem>().WillBeHangRemove)
+                                    {
+                                        AddClearType("C", 1);
+                                    }
+                                }
+                                else if (_clearCombo > 0)
+                                {
+                                    if (_movedBlockItem.GetComponent<BlockItem>().WillBeHangRemove)
+                                    {
+                                        AddClearType("C", _clearCombo);
+                                    }
+                                    else
+                                    {
+                                        AddClearType("C", _clearCombo + 1);
+                                    }
+                                }
+                            }
+
+                            var nextMoveEndWaitTime = Constant.DownEndWaitTime;
+                            if (clearSpecialEdgeBlocks.Count > 0 ||
+                                (clearSpecialEdgeBlocksBronze != null && clearSpecialEdgeBlocksBronze.Count > 0) ||
+                                isSpecialGold)
+                            {
+                                nextMoveEndWaitTime += Constant.SpecialEdgeClearTime;
+                            }
+
+                            StartCoroutine(Delay.Run(() => { MoveEnd(); }, nextMoveEndWaitTime));
+                        }, clearWaitTime));
+                    }
+                    else
+                    {
+                        StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.1f));
+                    }
+                }, Constant.DownAnimTime + 0.01f));
             }
             else
             {
@@ -1302,6 +1342,7 @@ namespace UI
                     {
                         ShowGameOverEff();
                     }
+
                     Player.SaveGameStatusData();
                 }
                 else
@@ -1331,6 +1372,7 @@ namespace UI
                             _userMove = false;
                         }
                     }
+
                     if (_userMove)
                     {
                         _userMove = false;
@@ -1339,13 +1381,13 @@ namespace UI
                     }
                     else
                     {
-                      
                         if (_specialGoldEffNoNewBlocksTime > 0 && Blocks.GetHangNum() <= 1)
                         {
                             _specialGoldEffNoNewBlocksTime = 0;
                         }
 
-                        if (_specialGoldEffNoNewBlocksTime <= 0 && Constant.GameStatusData.DWAD_REMAINING_STEP <= 0 && Blocks.GetHangNum() < Blocks.GetMaxHangNumByScore(Player.GetCurScore()))
+                        if (_specialGoldEffNoNewBlocksTime <= 0 && Constant.GameStatusData.DWAD_REMAINING_STEP <= 0 &&
+                            Blocks.GetHangNum() < Blocks.GetMaxHangNumByScore(Player.GetCurScore()))
                         {
                             if (Blocks.IsTesting() && !Blocks.GetBlocksTest().ShouldAddBlockItems())
                             {
@@ -1354,7 +1396,8 @@ namespace UI
 
                             AddBlockItems();
                             var canAutoClear = !(Blocks.IsTesting() && !Blocks.GetBlocksTest().EnableAutoClear());
-                            StartCoroutine(Delay.Run(() => { MoveEnd(null, "", false, canAutoClear); }, Constant.UpAnimTime + Constant.UpEndWaitTime));
+                            StartCoroutine(Delay.Run(() => { MoveEnd(null, "", false, canAutoClear); },
+                                Constant.UpAnimTime + Constant.UpEndWaitTime));
                         }
                         else
                         {
@@ -1396,13 +1439,12 @@ namespace UI
                             {
                                 _userMoveLevel = Blocks.CurLevel;
 
-                                StartCoroutine(Delay.Run(() =>
-                                {
-                                    Constant.EffCtrlScript.ShowLevelUpEff(Blocks.CurLevel);
-                                }, userCanMoveTime + 0.1f));
+                                StartCoroutine(Delay.Run(
+                                    () => { Constant.EffCtrlScript.ShowLevelUpEff(Blocks.CurLevel); },
+                                    userCanMoveTime + 0.1f));
                             }
 
-                           
+
                             var iceBlocks = Blocks.GetIceBlocks();
                             if (iceBlocks != null && iceBlocks.Count > 0)
                             {
@@ -1432,7 +1474,6 @@ namespace UI
                             }
                             else
                             {
-                            
                                 var stoneBlocks = Blocks.GetStoneBlocks();
                                 if (stoneBlocks != null && stoneBlocks.Count > 0)
                                 {
@@ -1480,6 +1521,7 @@ namespace UI
                                         CheckShowTopUIMask();
                                     }
                                 }
+
                                 _clearCombo = -1;
                                 _clearComboSound = -1;
                                 Player.UserCanMove = true;
@@ -1525,9 +1567,11 @@ namespace UI
                 var localPosition = blockItem.transform.localPosition;
                 localPosition = new Vector2(localPosition.x, Constant.BlockGroupEdgeBottom - Constant.BlockHeight);
                 blockItem.transform.localPosition = localPosition;
-                blockItem.transform.DOLocalMoveY(localPosition.y + Constant.BlockHeight, Constant.UpAnimTime).SetEase(_easeEff);
+                blockItem.transform.DOLocalMoveY(localPosition.y + Constant.BlockHeight, Constant.UpAnimTime)
+                    .SetEase(_easeEff);
                 blockItem.GetComponent<BlockItem>().LastDownOffsetY = 0;
             }
+
             _readyBlocksData.RemoveAt(0);
             AddReadyBlockItems();
         }
@@ -1566,14 +1610,17 @@ namespace UI
             item.transform.DOKill();
             item.transform.SetParent(blockGroup.transform);
             item.transform.localScale = Vector2.one;
-            item.transform.localPosition = new Vector2(Constant.BlockGroupEdgeLeft + Constant.BlockWidth * Blocks.GetLieByPos(data[(int)Blocks.Key.Pos]), Constant.BlockGroupEdgeBottom + Constant.BlockHeight * Blocks.GetHangByPos(data[(int)Blocks.Key.Pos]));
+            item.transform.localPosition = new Vector2(
+                Constant.BlockGroupEdgeLeft + Constant.BlockWidth * Blocks.GetLieByPos(data[(int)Blocks.Key.Pos]),
+                Constant.BlockGroupEdgeBottom + Constant.BlockHeight * Blocks.GetHangByPos(data[(int)Blocks.Key.Pos]));
             item.transform.localRotation = Quaternion.Euler(0, 0, 0);
             item.GetComponent<BlockItem>().UpdateUi(data, blockBgLightEff, blockBgTip, blockLightTip);
             item.GetComponent<CanvasGroup>().alpha = 1;
 
             if (item.GetComponent<BlockItem>().IsSpecial())
             {
-                Constant.EffCtrlScript.AddSpecialEff(item, item.GetComponent<BlockItem>().GetSpecial(), specialGoldSuccess);
+                Constant.EffCtrlScript.AddSpecialEff(item, item.GetComponent<BlockItem>().GetSpecial(),
+                    specialGoldSuccess);
             }
 
             if (item.GetComponent<BlockItem>().HaveIce())
@@ -1640,7 +1687,9 @@ namespace UI
                     //                    {
                     _itemList[i + Constant.Lie] = _itemList[i];
                     _itemList[i] = null;
-                    _itemList[i + Constant.Lie].transform.DOLocalMoveY(_itemList[i + Constant.Lie].transform.localPosition.y + Constant.BlockHeight, Constant.UpAnimTime).SetEase(_easeEff);
+                    _itemList[i + Constant.Lie].transform
+                        .DOLocalMoveY(_itemList[i + Constant.Lie].transform.localPosition.y + Constant.BlockHeight,
+                            Constant.UpAnimTime).SetEase(_easeEff);
 
                     _itemList[i + Constant.Lie].GetComponent<BlockItem>().LastDownOffsetY = 0;
                     //                    }
@@ -1656,11 +1705,12 @@ namespace UI
             {
                 if (_itemList[downData[1]] != null)
                 {
-                   
                     _itemList[downData[1] + Constant.Lie * downData[0]] = _itemList[downData[1]];
                     _itemList[downData[1]] = null;
                     _itemList[downData[1] + Constant.Lie * downData[0]].transform
-                        .DOLocalMoveY(_itemList[downData[1] + Constant.Lie * downData[0]].transform.localPosition.y + Constant.BlockHeight * downData[0],
+                        .DOLocalMoveY(
+                            _itemList[downData[1] + Constant.Lie * downData[0]].transform.localPosition.y +
+                            Constant.BlockHeight * downData[0],
                             Constant.DownAnimTime).SetEase(_easeEff);
 
                     _itemList[downData[1] + Constant.Lie * downData[0]].GetComponent<BlockItem>().LastDownOffsetY =
@@ -1727,10 +1777,7 @@ namespace UI
                                 _b421BlockItem = null;
                             }
 
-                            StartCoroutine(Delay.Run(() =>
-                            {
-                                MoveEnd();
-                            }, 0.1f));
+                            StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.1f));
                         }));
                     seq.SetUpdate(true);
                 }
@@ -1783,34 +1830,35 @@ namespace UI
                             var tmpCurCount = curCount;
                             var seq = DOTween.Sequence();
                             seq.Append(item.transform.DOScale(new Vector3(1.3f, 1.3f, 1), 0.1f).SetDelay(delayTime1));
-                            seq.Append(item.transform.DOScale(new Vector3(1, 1, 1), 0.15f).SetDelay(delayTime2).OnComplete(
-                                () =>
-                                {
-                                    Constant.EffCtrlScript.RemoveHighLightEff(item);
-                                    if (tmpCurCount % 3 == 1)
+                            seq.Append(item.transform.DOScale(new Vector3(1, 1, 1), 0.15f).SetDelay(delayTime2)
+                                .OnComplete(
+                                    () =>
                                     {
-                                        Constant.EffCtrlScript.ShowShakeEff();
-                                    }
-
-                                    Constant.EffCtrlScript.RemoveBlackMaskEff();
-                                    Constant.EffCtrlScript.ShowClearBlockEff(item);
-
-                                    var curPosIndex = item.GetComponent<BlockItem>().GetPosIndex();
-                                    var curLength = item.GetComponent<BlockItem>().GetLength();
-                                    RemoveBlockItemByIndex(curPosIndex);
-                                    for (var i = curPosIndex; i < curPosIndex + curLength; ++i)
-                                    {
-                                        if (newBlocks[i] != null)
+                                        Constant.EffCtrlScript.RemoveHighLightEff(item);
+                                        if (tmpCurCount % 3 == 1)
                                         {
-                                            CreateBlockItem(newBlocks[i]);
+                                            Constant.EffCtrlScript.ShowShakeEff();
                                         }
-                                    }
 
-                                    if (curPosIndex == lastPosIndex)
-                                    {
-                                        StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.5f));
-                                    }
-                                }));
+                                        Constant.EffCtrlScript.RemoveBlackMaskEff();
+                                        Constant.EffCtrlScript.ShowClearBlockEff(item);
+
+                                        var curPosIndex = item.GetComponent<BlockItem>().GetPosIndex();
+                                        var curLength = item.GetComponent<BlockItem>().GetLength();
+                                        RemoveBlockItemByIndex(curPosIndex);
+                                        for (var i = curPosIndex; i < curPosIndex + curLength; ++i)
+                                        {
+                                            if (newBlocks[i] != null)
+                                            {
+                                                CreateBlockItem(newBlocks[i]);
+                                            }
+                                        }
+
+                                        if (curPosIndex == lastPosIndex)
+                                        {
+                                            StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.5f));
+                                        }
+                                    }));
                             seq.SetUpdate(true);
                         }
                     }
@@ -1833,8 +1881,8 @@ namespace UI
                 Constant.EffCtrlScript.ShowSecondChanceClearHangEff(() =>
                 {
                     for (var hang = Constant.SecondChanceHangStart;
-                        hang < Constant.SecondChanceHangStart + Constant.SecondChanceHangNum;
-                        ++hang)
+                         hang < Constant.SecondChanceHangStart + Constant.SecondChanceHangNum;
+                         ++hang)
                     {
                         for (var posIndex = hang * Constant.Lie; posIndex < (hang + 1) * Constant.Lie; ++posIndex)
                         {
@@ -1872,8 +1920,8 @@ namespace UI
                 Constant.EffCtrlScript.ShowSecondChanceClearHangEff(() =>
                 {
                     for (var hang = Constant.SecondChanceHangStart;
-                        hang < Constant.SecondChanceHangStart + Constant.SecondChanceHangNum;
-                        ++hang)
+                         hang < Constant.SecondChanceHangStart + Constant.SecondChanceHangNum;
+                         ++hang)
                     {
                         for (var posIndex = hang * Constant.Lie; posIndex < (hang + 1) * Constant.Lie; ++posIndex)
                         {
@@ -1912,20 +1960,20 @@ namespace UI
             {
                 var hang1 = hang;
                 StartCoroutine(Delay.Run(() =>
+                {
+                    for (var posIndex = hang1 * Constant.Lie; posIndex < (hang1 + 1) * Constant.Lie; ++posIndex)
                     {
-                        for (var posIndex = hang1 * Constant.Lie; posIndex < (hang1 + 1) * Constant.Lie; ++posIndex)
+                        if (_itemList[posIndex] != null)
                         {
-                            if (_itemList[posIndex] != null)
-                            {
-                                Constant.EffCtrlScript.ShowBlockItemGrayEff(_itemList[posIndex]);
-                            }
+                            Constant.EffCtrlScript.ShowBlockItemGrayEff(_itemList[posIndex]);
                         }
+                    }
 
-                        if (hang1 == 0)
-                        {
-                            StartCoroutine(Delay.Run(() => { ShowGameOverDialog(); }, 0.3f));
-                        }
-                    }, 0.15f * (Constant.Hang - hang)));
+                    if (hang1 == 0)
+                    {
+                        StartCoroutine(Delay.Run(() => { ShowGameOverDialog(); }, 0.3f));
+                    }
+                }, 0.15f * (Constant.Hang - hang)));
             }
 
             ManagerAudio.PauseBgm();
@@ -1936,8 +1984,6 @@ namespace UI
 
         public void ShowGameOverDialog(bool showAd = true)
         {
-
-
             ReallyShowGameOverDialog();
             Player.SaveGameStatusData();
 
@@ -1950,8 +1996,6 @@ namespace UI
             {
                 Advertisements.Instance.ShowInterstitial();
             }
-            
-           
         }
 
         public void ClearBlocksData()
@@ -1970,7 +2014,8 @@ namespace UI
 
                     if (Constant.B421Switch)
                     {
-                        if (!Constant.GameStatusData.b421_Clk && !Constant.GameStatusData.continueClk && !Constant.EffCtrlScript.IsB421EffShowing() && ManagerAd.HaveRewardAd())
+                        if (!Constant.GameStatusData.b421_Clk && !Constant.GameStatusData.continueClk &&
+                            !Constant.EffCtrlScript.IsB421EffShowing() && ManagerAd.HaveRewardAd())
                         {
                             var posIndex = Blocks.GetB421Block();
                             if (posIndex > -1 && _itemList[posIndex] != null)
@@ -2017,6 +2062,7 @@ namespace UI
                 {
                     Constant.EffCtrlScript.ShowSpecialGoldOtherEff(item, "daiji");
                 }
+
                 _specialGoldItem = null;
             }
         }
@@ -2025,12 +2071,13 @@ namespace UI
         {
             if (Blocks.IsTesting()) return;
 
-            if (!Player.IsInGuide() && _clearTipTime >= Constant.ClearTipTimeMax && !Constant.EffCtrlScript.IsShowingClearTip() && Player.UserCanMove && !Player.IsBlockMoving)
+            if (!Player.IsInGuide() && _clearTipTime >= Constant.ClearTipTimeMax &&
+                !Constant.EffCtrlScript.IsShowingClearTip() && Player.UserCanMove && !Player.IsBlockMoving)
             {
                 var clearTipData = Blocks.GetClearTip();
                 if (clearTipData != null)
                 {
-                   // DebugEx.Log("操作提示：", clearTipData[2], "移动", clearTipData[0]);
+                    // DebugEx.Log("操作提示：", clearTipData[2], "移动", clearTipData[0]);
                     Constant.EffCtrlScript.ShowClearTip(_itemList[clearTipData[2]], clearTipData);
 
                     ++Constant.GameStatusData.GuideTime;
@@ -2050,7 +2097,6 @@ namespace UI
                 }
                 else
                 {
-                  
                     ResetClearTipTime();
                 }
             }
@@ -2080,6 +2126,7 @@ namespace UI
                     {
                         Constant.AchievementScript.AddAchievementTip("SKILLFUL MOVES", num);
                     }
+
                     break;
             }
         }
@@ -2117,15 +2164,11 @@ namespace UI
                 }
             }
 
-            StartCoroutine(Delay.Run(() =>
-            {
-                MoveEnd();
-            }, 1));
+            StartCoroutine(Delay.Run(() => { MoveEnd(); }, 1));
         }
 
         public void UpdatePropInfo()
         {
-
         }
 
         public GameObject GetBlockItemByPosIndex(int posIndex)
@@ -2158,6 +2201,7 @@ namespace UI
                     }
                 }
             }
+
             return false;
         }
 
@@ -2172,7 +2216,7 @@ namespace UI
             StartCoroutine(Delay.Run(() =>
             {
                 --_specialGoldEffNoNewBlocksTime;
-               
+
                 if (_specialGoldEffNoNewBlocksTime > 0)
                 {
                     UpdateSpecialGoldNoNewBlocksTime();
@@ -2242,6 +2286,7 @@ namespace UI
                 var tmpPrefab = MaterPool.Instace.SecondChanceDialog;
                 ManagerDialog.AddDialog("SecondChanceDialog", tmpPrefab);
             }
+
             ManagerDialog.CreateDialog("SecondChanceDialog");
         }
 
@@ -2258,6 +2303,7 @@ namespace UI
                 var tmpPrefab = MaterPool.Instace.GameOverDialog;
                 ManagerDialog.AddDialog("GameOverDialog", tmpPrefab);
             }
+
             ManagerDialog.CreateDialog("GameOverDialog");
         }
 
@@ -2272,6 +2318,7 @@ namespace UI
 //            }
 //            ManagerDialog.CreateDialog("RateDialog");
         }
+
 //no
         private async void ShowSpecialGoldDialog(Vector2 pos)
         {
@@ -2298,6 +2345,7 @@ namespace UI
                 var tmpPrefab = MaterPool.Instace.SettingsDialog;
                 ManagerDialog.AddDialog("SettingsDialog", tmpPrefab);
             }
+
             ManagerDialog.CreateDialog("SettingsDialog");
         }
 
@@ -2307,9 +2355,9 @@ namespace UI
             {
                 Constant.GameStatusData.InningTime += Constant.FrameTime;
             }
+
             _clearTipTime += Constant.FrameTime;
             CheckClearTip();
-
         }
     }
 }
