@@ -13,6 +13,8 @@ namespace Boosters
 
         [SerializeField] private Booster hammerBooster, magnetBooster;
         [SerializeField] private GamePlayDialog gamePlayDialog;
+        [SerializeField] private AudioSource audioSource;
+        [SerializeField] private AudioClip hammerAudio, magnetAudio;
 
         private int countHammer = 0, countMagnet = 0;
 
@@ -35,6 +37,12 @@ namespace Boosters
 
                 return;
             }
+            else
+            {
+                DisableBoosters();
+            }
+
+            activeBooster = typeBooster;
 
             if (typeBooster == TypeBooster.Hammer && countHammer > 0)
             {
@@ -52,21 +60,24 @@ namespace Boosters
 
         private void UseHammer(int index)
         {
+            PlayAudio();
+
             Blocks.ClearBlockDataByIndex(index);
             gamePlayDialog.RemoveBlockItemByIndex(index, false);
             Blocks.UpdateMap();
             StartCoroutine(Delay.Run(() => { gamePlayDialog.MoveEnd(); }, 0.05f));
             Player.SaveGameStatusData();
-            
-            DisableBoosters();
 
+            DisableBoosters();
         }
 
         private void UseMagnet(Vector2 position)
         {
+            PlayAudio();
+            
             var itemList = gamePlayDialog.ItemList;
             var posY = position.y;
-                
+
             for (var i = 0; i < itemList.Count; ++i)
             {
                 if (itemList[i] != null)
@@ -74,13 +85,13 @@ namespace Boosters
                     if (itemList[i].TryGetComponent(out BlockItem blockItem))
                     {
                         blockItem.SetOriginalPos();
-                            
+
                         var blockPos = blockItem.OriginalPos;
-                            
+
                         Debug.Log($"PosY: {posY}");
                         Debug.Log($"Block Y: {blockPos.y}");
 
-                            
+
                         if (posY == blockPos.y)
                         {
                             Blocks.ClearBlockDataByIndex(i);
@@ -93,8 +104,22 @@ namespace Boosters
             Blocks.UpdateMap();
             StartCoroutine(Delay.Run(() => { gamePlayDialog.MoveEnd(); }, 0.05f));
             Player.SaveGameStatusData();
-            
+
             DisableBoosters();
+        }
+
+        private void PlayAudio()
+        {
+            if (activeBooster == TypeBooster.Hammer)
+            {
+                audioSource.clip = hammerAudio;
+            }
+            else if (activeBooster == TypeBooster.Magnet)
+            {
+                audioSource.clip = magnetAudio;
+            }
+            
+            audioSource.Play();
         }
 
         private void DisableBoosters()
@@ -103,7 +128,7 @@ namespace Boosters
 
             BlockItem.Touched -= UseHammer;
             BlockItem.Selected -= UseMagnet;
-            
+
             magnetBooster.SetActive(false);
             hammerBooster.SetActive(false);
         }
