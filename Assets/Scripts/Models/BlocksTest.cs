@@ -875,7 +875,7 @@ namespace Models
 //                    
 //                    new List<int[]>
 //                    {
-//                        new []{3, (int)Blocks.Color.Blue, 2, (int) Blocks.Special.Gold, 0, 0},
+//                        new []{3, (int)Blocks.Color.Blue, 2, (int) Blocks.Special.GoldController, 0, 0},
 //                        new []{3, (int)Blocks.Color.Blue, 5, 0, 0, 0},
 //                    },
 //                    
@@ -1008,7 +1008,7 @@ namespace Models
 //                    new List<int[]>
 //                    {
 //                        new []{2, (int)Blocks.Color.Yellow, 0, 0, 0, 0},
-//                        new []{4, (int)Blocks.Color.Blue, 2, (int)Blocks.Special.Gold, 0, 0},
+//                        new []{4, (int)Blocks.Color.Blue, 2, (int)Blocks.Special.GoldController, 0, 0},
 //                        new []{1, (int)Blocks.Color.Green, 7, 0, 0, 0},
 //                    },
 //                    
@@ -1132,7 +1132,7 @@ namespace Models
 //                    new List<int[]>
 //                    {
 //                        new []{2, (int)Blocks.Color.Yellow, 0, 0, 0, 0},
-//                        new []{4, (int)Blocks.Color.Blue, 2, (int)Blocks.Special.Gold, 0, 0},
+//                        new []{4, (int)Blocks.Color.Blue, 2, (int)Blocks.Special.GoldController, 0, 0},
 //                        new []{1, (int)Blocks.Color.Green, 7, 0, 0, 0},
 //                    },
 //                    
@@ -1187,7 +1187,7 @@ namespace Models
 //                    new List<int[]>
 //                    {
 //                        new []{2, (int)Blocks.Color.Yellow, 0, 0, 0, 0},
-////                        new []{3, (int)Blocks.Color.Red, 3, (int)Blocks.Special.Gold, 0, 0},
+////                        new []{3, (int)Blocks.Color.Red, 3, (int)Blocks.Special.GoldController, 0, 0},
 //                        new []{3, (int)Blocks.Color.Red, 3, 0, 0, 0},
 //                        new []{2, (int)Blocks.Color.Yellow, 6, 0, 0, 0},
 //                    },

@@ -1042,7 +1042,7 @@ namespace Models
 ////            test
                         // if (Constant.SpecialGoldSwitch && Constant.GameStatusData.TotalBlockCount % 2 == 0 && !BlocksHaveSpecialGold())
                         // {
-                        //     blocksArr[Tools.GetNumFromRange(0, blocksArr.Count - 1)][(int) Key.Special] = (int)Special.Gold;
+                        //     blocksArr[Tools.GetNumFromRange(0, blocksArr.Count - 1)][(int) Key.Special] = (int)Special.GoldController;
                         // }
 
             return blocksArr;
