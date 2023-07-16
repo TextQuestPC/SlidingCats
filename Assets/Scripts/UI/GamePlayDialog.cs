@@ -371,6 +371,17 @@ namespace UI
             }
         }
 
+        public void UseHammerBooster(int index)
+        {
+            Constant.EffCtrlScript.ShowClearBlockEff(_itemList[index]);
+
+            Blocks.ClearBlockDataByIndex(index);
+            RemoveBlockItemByIndex(index, true);
+            Blocks.UpdateMap();
+            StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.05f));
+            Player.SaveGameStatusData();
+        }
+        
         public void MoveEnd(int[] moveData = null, string previousBlocks = "", bool specialGoldSuccess = false, bool autoClear = true)
         {
             if (Blocks.GetHangNum() <= 0 && Blocks.GetMaxHangNumByScore(Player.GetCurScore()) >= 3)
@@ -1550,8 +1561,11 @@ namespace UI
                 var item = _itemList[index];
                 if (showAnim)
                 {
+                    Debug.Log($"before   fade");
+
                     item.GetComponent<CanvasGroup>().DOFade(0, Constant.BlockRemoveTime).OnComplete(() =>
                     {
+                        Debug.Log($"after fade");
                         RemoveBlockItemOtherEff(item);
                         _blockItemsPool.Put(item);
                     });

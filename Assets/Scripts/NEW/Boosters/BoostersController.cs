@@ -9,7 +9,7 @@ namespace Boosters
     public class BoostersController : Singleton<BoostersController>
     {
         private const string KEY_HAMMER = "Hammer", KEY_MAGNET = "Magnet";
-        private const int DEFAULT_COUNT_HAMMER = 4, DEFAULT_COUNT_MAGNET = 2;
+        private const int DEFAULT_COUNT_HAMMER = 40, DEFAULT_COUNT_MAGNET = 20;
 
         [SerializeField] private Booster hammerBooster, magnetBooster;
         [SerializeField] private GamePlayDialog gamePlayDialog;
@@ -24,6 +24,7 @@ namespace Boosters
         {
             countHammer = PlayerPrefs.GetInt(KEY_HAMMER, DEFAULT_COUNT_HAMMER);
             countMagnet = PlayerPrefs.GetInt(KEY_MAGNET, DEFAULT_COUNT_MAGNET);
+            SaveCountBooster();
 
             hammerBooster.SetData(countHammer);
             magnetBooster.SetData(countMagnet);
@@ -61,12 +62,12 @@ namespace Boosters
         private void UseHammer(int index)
         {
             PlayAudio();
+            
+            gamePlayDialog.UseHammerBooster(index);
 
-            Blocks.ClearBlockDataByIndex(index);
-            gamePlayDialog.RemoveBlockItemByIndex(index, false);
-            Blocks.UpdateMap();
-            StartCoroutine(Delay.Run(() => { gamePlayDialog.MoveEnd(); }, 0.05f));
-            Player.SaveGameStatusData();
+            countHammer--;
+            hammerBooster.SetData(countHammer);
+            SaveCountBooster();
 
             DisableBoosters();
         }
@@ -95,7 +96,7 @@ namespace Boosters
                         if (posY == blockPos.y)
                         {
                             Blocks.ClearBlockDataByIndex(i);
-                            gamePlayDialog.RemoveBlockItemByIndex(i, false);
+                            gamePlayDialog.RemoveBlockItemByIndex(i, true);
                         }
                     }
                 }
@@ -104,6 +105,10 @@ namespace Boosters
             Blocks.UpdateMap();
             StartCoroutine(Delay.Run(() => { gamePlayDialog.MoveEnd(); }, 0.05f));
             Player.SaveGameStatusData();
+            
+            countMagnet--;
+            magnetBooster.SetData(countMagnet);
+            SaveCountBooster();
 
             DisableBoosters();
         }
@@ -131,6 +136,12 @@ namespace Boosters
 
             magnetBooster.SetActive(false);
             hammerBooster.SetActive(false);
+        }
+        
+        private void SaveCountBooster()
+        {
+            PlayerPrefs.SetInt(KEY_HAMMER, countHammer);
+            PlayerPrefs.SetInt(KEY_MAGNET, countMagnet);
         }
     }
 
