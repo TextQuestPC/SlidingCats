@@ -381,6 +381,37 @@ namespace UI
             StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.05f));
             Player.SaveGameStatusData();
         }
+
+        public void UseMagnet(Vector2 position)
+        {
+            var itemList = ItemList;
+            var posY = position.y;
+
+            for (var i = 0; i < itemList.Count; ++i)
+            {
+                if (itemList[i] != null)
+                {
+                    if (itemList[i].TryGetComponent(out BlockItem blockItem))
+                    {
+                        blockItem.SetOriginalPos();
+
+                        var blockPos = blockItem.OriginalPos;
+
+                        if (posY == blockPos.y)
+                        {
+                            Constant.EffCtrlScript.ShowClearBlockEff(_itemList[i]);
+
+                            Blocks.ClearBlockDataByIndex(i);
+                            RemoveBlockItemByIndex(i, true);
+                        }
+                    }
+                }
+            }
+
+            Blocks.UpdateMap();
+            StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.05f));
+            Player.SaveGameStatusData();
+        }
         
         public void MoveEnd(int[] moveData = null, string previousBlocks = "", bool specialGoldSuccess = false, bool autoClear = true)
         {
@@ -1561,11 +1592,8 @@ namespace UI
                 var item = _itemList[index];
                 if (showAnim)
                 {
-                    Debug.Log($"before   fade");
-
                     item.GetComponent<CanvasGroup>().DOFade(0, Constant.BlockRemoveTime).OnComplete(() =>
                     {
-                        Debug.Log($"after fade");
                         RemoveBlockItemOtherEff(item);
                         _blockItemsPool.Put(item);
                     });

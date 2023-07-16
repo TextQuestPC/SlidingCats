@@ -76,35 +76,7 @@ namespace Boosters
         {
             PlayAudio();
             
-            var itemList = gamePlayDialog.ItemList;
-            var posY = position.y;
-
-            for (var i = 0; i < itemList.Count; ++i)
-            {
-                if (itemList[i] != null)
-                {
-                    if (itemList[i].TryGetComponent(out BlockItem blockItem))
-                    {
-                        blockItem.SetOriginalPos();
-
-                        var blockPos = blockItem.OriginalPos;
-
-                        Debug.Log($"PosY: {posY}");
-                        Debug.Log($"Block Y: {blockPos.y}");
-
-
-                        if (posY == blockPos.y)
-                        {
-                            Blocks.ClearBlockDataByIndex(i);
-                            gamePlayDialog.RemoveBlockItemByIndex(i, true);
-                        }
-                    }
-                }
-            }
-
-            Blocks.UpdateMap();
-            StartCoroutine(Delay.Run(() => { gamePlayDialog.MoveEnd(); }, 0.05f));
-            Player.SaveGameStatusData();
+            gamePlayDialog.UseMagnet(position);
             
             countMagnet--;
             magnetBooster.SetData(countMagnet);
