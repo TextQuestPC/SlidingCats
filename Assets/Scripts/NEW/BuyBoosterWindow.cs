@@ -7,20 +7,18 @@ namespace Boosters
 {
     public class BuyBoosterWindow : Singleton<BuyBoosterWindow>
     {
+        private const float OFFSET_SUBSTRTE = 1200f;
+        
         [SerializeField] private Sprite hammerSprite, magnetSprite;
         [Space] [SerializeField] private GameObject background, substrate;
         [SerializeField] private Button closeButton;
         [SerializeField] private BuyComponent[] buyComponents;
-
-        private Vector3 startSubstratePosition;
 
         private List<BuyData> bucketBuyData, bombBuyData;
         private bool isBucket;
 
         private void Start()
         {
-            startSubstratePosition = substrate.transform.position;
-
             bucketBuyData = new List<BuyData>();
             bombBuyData = new List<BuyData>();
 
@@ -101,7 +99,9 @@ namespace Boosters
 
         private void CloseWindow()
         {
-            substrate.transform.DOLocalMove(startSubstratePosition, 0.3f);
+            Vector3 position = substrate.transform.position;
+            position.x += OFFSET_SUBSTRTE;
+            substrate.transform.DOLocalMove(position, 0.3f);
             DOTween.Sequence().AppendInterval(0.3f).OnComplete(() => { background.SetActive(false); });
         }
     }

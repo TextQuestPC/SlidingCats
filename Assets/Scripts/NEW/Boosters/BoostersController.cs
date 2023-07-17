@@ -1,7 +1,4 @@
-using Boosters;
 using DG.Tweening;
-using Models;
-using Other;
 using UI;
 using UnityEngine;
 
@@ -10,7 +7,7 @@ namespace Boosters
     public class BoostersController : Singleton<BoostersController>
     {
         private const string KEY_HAMMER = "Hammer", KEY_MAGNET = "Magnet";
-        private const int DEFAULT_COUNT_HAMMER = 40, DEFAULT_COUNT_MAGNET = 20;
+        private const int DEFAULT_COUNT_HAMMER = 4, DEFAULT_COUNT_MAGNET = 2;
 
         [SerializeField] private Booster hammerBooster, magnetBooster;
         [SerializeField] private GamePlayDialog gamePlayDialog;
@@ -64,25 +61,41 @@ namespace Boosters
 
             activeBooster = typeBooster;
             BoosterIsActive = true;
-            
-            if (typeBooster == TypeBooster.Hammer && countHammer > 0)
+
+            if (typeBooster == TypeBooster.Hammer)
             {
-                activeBooster = TypeBooster.Hammer;
-                BlockItem.Touched += UseHammer;
-                hammerBooster.SetActive(true);
+                if (countHammer > 0)
+                {
+                    activeBooster = TypeBooster.Hammer;
+                    BlockItem.Touched += UseHammer;
+                    hammerBooster.SetActive(true);
+                }
+                else
+                {
+                    BuyBoosterWindow.Instance.OpenWindow(TypeBooster.Hammer);
+                    DisableBoosters();
+                }
             }
-            else if (typeBooster == TypeBooster.Magnet && countMagnet > 0)
+            else if (typeBooster == TypeBooster.Magnet)
             {
-                activeBooster = TypeBooster.Magnet;
-                BlockItem.Selected += UseMagnet;
-                magnetBooster.SetActive(true);
+                if (countMagnet > 0)
+                {
+                    activeBooster = TypeBooster.Magnet;
+                    BlockItem.Selected += UseMagnet;
+                    magnetBooster.SetActive(true);
+                }
+                else
+                {
+                    BuyBoosterWindow.Instance.OpenWindow(TypeBooster.Magnet);
+                    DisableBoosters();
+                }
             }
         }
 
         private void UseHammer(int index)
         {
             PlayAudio();
-            
+
             gamePlayDialog.UseHammerBooster(index);
 
             countHammer--;
@@ -97,15 +110,15 @@ namespace Boosters
         private void UseMagnet(Vector2 position)
         {
             PlayAudio();
-            
+
             gamePlayDialog.UseMagnet(position);
-            
+
             countMagnet--;
             magnetBooster.SetData(countMagnet);
             SaveCountBooster();
 
             DisableBoosters();
-            
+
             DOTween.Sequence().AppendInterval(0.1f).OnComplete(() => BoosterIsActive = false);
         }
 
@@ -119,7 +132,7 @@ namespace Boosters
             {
                 audioSource.clip = magnetAudio;
             }
-            
+
             audioSource.Play();
         }
 
@@ -134,7 +147,7 @@ namespace Boosters
             magnetBooster.SetActive(false);
             hammerBooster.SetActive(false);
         }
-        
+
         private void SaveCountBooster()
         {
             PlayerPrefs.SetInt(KEY_HAMMER, countHammer);

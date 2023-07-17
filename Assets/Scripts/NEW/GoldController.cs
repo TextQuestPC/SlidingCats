@@ -4,7 +4,7 @@ using UnityEngine;
 public class GoldController : Singleton<GoldController>
 {
     private const string KEY_GOLD = "KEY_GOLD";
-    private const int DEFAULT_GOLD = 0;
+    private const int DEFAULT_GOLD = 20;
     
     [SerializeField] private TextMeshProUGUI goldText;
 
@@ -13,6 +13,7 @@ public class GoldController : Singleton<GoldController>
     protected override void AfterAwaik()
     {
         countGold = PlayerPrefs.GetInt(KEY_GOLD, DEFAULT_GOLD);
+        goldText.text = countGold.ToString();
     }
 
     public void AddGold(int value)
