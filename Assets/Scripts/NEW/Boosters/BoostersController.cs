@@ -34,13 +34,16 @@ namespace Boosters
 
         public void AddBooster(TypeBooster typeBooster, int count)
         {
+            Debug.Log($"add booster {typeBooster} count {count}");
             if (typeBooster == TypeBooster.Hammer)
             {
                 countHammer += count;
+                hammerBooster.SetData(countHammer);
             }
             else if (typeBooster == TypeBooster.Magnet)
             {
                 countMagnet += count;
+                magnetBooster.SetData(countMagnet);
             }
 
             SaveCountBooster();

@@ -8,25 +8,25 @@ namespace Boosters
     public class BuyBoosterWindow : Singleton<BuyBoosterWindow>
     {
         private const float OFFSET_SUBSTRTE = 1200f;
-        
+
         [SerializeField] private Sprite hammerSprite, magnetSprite;
         [Space] [SerializeField] private GameObject background, substrate;
         [SerializeField] private Button closeButton;
         [SerializeField] private BuyComponent[] buyComponents;
 
-        private List<BuyData> bucketBuyData, bombBuyData;
+        private List<BuyData> hammerBuyData, magnetBuyData;
         private bool isBucket;
 
         private void Start()
         {
-            bucketBuyData = new List<BuyData>();
-            bombBuyData = new List<BuyData>();
+            hammerBuyData = new List<BuyData>();
+            magnetBuyData = new List<BuyData>();
 
-            bucketBuyData.Add(new BuyData(TypeBooster.Hammer, hammerSprite, true, 0, 4));
-            bucketBuyData.Add(new BuyData(TypeBooster.Hammer, hammerSprite, false, 20, 4));
+            hammerBuyData.Add(new BuyData(TypeBooster.Hammer, hammerSprite, true, 0, 4));
+            hammerBuyData.Add(new BuyData(TypeBooster.Hammer, hammerSprite, false, 20, 4));
 
-            bombBuyData.Add(new BuyData(TypeBooster.Magnet, magnetSprite, true, 0, 2));
-            bombBuyData.Add(new BuyData(TypeBooster.Magnet, magnetSprite, false, 20, 4));
+            magnetBuyData.Add(new BuyData(TypeBooster.Magnet, magnetSprite, true, 0, 2));
+            magnetBuyData.Add(new BuyData(TypeBooster.Magnet, magnetSprite, false, 20, 4));
 
             closeButton.onClick.AddListener(() => { CloseWindow(); });
         }
@@ -50,10 +50,7 @@ namespace Boosters
 
                     AdManager.Instance.ShowReward((bool isShow) =>
                     {
-                        if (isShow)
-                        {
-                            BoostersController.Instance.AddBooster(data.TypeBooster, data.CountBoosters);
-                        }
+                        BoostersController.Instance.AddBooster(data.TypeBooster, data.CountBoosters);
                     });
                 }
             }
@@ -80,14 +77,14 @@ namespace Boosters
             {
                 for (int i = 0; i < buyComponents.Length; i++)
                 {
-                    buyComponents[i].SetData(bombBuyData[i]);
+                    buyComponents[i].SetData(hammerBuyData[i]);
                 }
             }
             else if (typeBooster == TypeBooster.Magnet)
             {
                 for (int i = 0; i < buyComponents.Length; i++)
                 {
-                    buyComponents[i].SetData(bucketBuyData[i]);
+                    buyComponents[i].SetData(magnetBuyData[i]);
                 }
             }
 
