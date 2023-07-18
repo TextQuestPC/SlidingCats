@@ -34,7 +34,6 @@ namespace Boosters
 
         public void AddBooster(TypeBooster typeBooster, int count)
         {
-            Debug.Log($"add booster {typeBooster} count {count}");
             if (typeBooster == TypeBooster.Hammer)
             {
                 countHammer += count;

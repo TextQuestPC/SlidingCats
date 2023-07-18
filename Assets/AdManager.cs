@@ -61,7 +61,7 @@ public class AdManager : MonoBehaviour
         Advertisements.Instance.Initialize();
         Advertisements.Instance.ShowBanner(BannerPosition.BOTTOM, BannerType.Banner);
 
-        if (PlayerPrefs.HasKey("COMPLETE_GUIDE"))
+        // if (PlayerPrefs.HasKey("COMPLETE_GUIDE"))
             Advertisements.Instance.ShowInterstitial();
     }
 
