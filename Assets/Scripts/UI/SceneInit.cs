@@ -14,12 +14,10 @@ namespace UI
 {
     public class SceneInit : MonoBehaviour
     {
-       
         public int emptyBlock1 = 6;
         public int emptyBlock2 = 3;
         public int emptyBlock3 = 2;
-        
-      
+
         public string sceneVersion;
         
         // Start is called before the first frame update
@@ -72,6 +70,11 @@ namespace UI
 //            Constant.ShowRemoveAd = true;
 //            Constant.ShowSpecialGoldDialogAnim = true;
 //#endif
+        }
+
+        private void AfterInit()
+        {
+            
         }
 
         void SetLevelText()

@@ -7,7 +7,7 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine;
@@ -18,7 +18,7 @@ public class AdManager : MonoBehaviour
     public GameObject GDPR;
 
     public static AdManager Instance;
-    
+
     public bool CanShowReward
     {
         get => Advertisements.Instance.IsRewardVideoAvailable();
@@ -45,7 +45,7 @@ public class AdManager : MonoBehaviour
             }
             else
             {
-                InitAd();
+                StartCoroutine(InitAd());
             }
         }
         else
@@ -55,20 +55,31 @@ public class AdManager : MonoBehaviour
     }
 
 
-    private void InitAd()
+    private IEnumerator InitAd()
     {
-        Advertisements.Instance.OnInit.AddListener(() =>
-        {
-            Advertisements.Instance.OnInit.RemoveAllListeners();
-            
-            SceneManager.LoadScene(1);
-        });
         
+
+        // Advertisements.Instance.OnInit.AddListener(() =>
+        // {
+        //     Advertisements.Instance.OnInit.RemoveAllListeners();
+        //
+        //
+        //     DOTween.Sequence().AppendInterval(8f).OnComplete(() => { });
+        // });
+
         Advertisements.Instance.Initialize();
+        
+        while (!Advertisements.Instance.IsInterstitialAvailable())
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        SceneManager.LoadScene(1);
+
         // Advertisements.Instance.ShowBanner(BannerPosition.BOTTOM, BannerType.Banner);
 
         // if (PlayerPrefs.HasKey("COMPLETE_GUIDE"))
-            // Advertisements.Instance.ShowInterstitial();
+        // Advertisements.Instance.ShowInterstitial();
     }
 
 
@@ -78,8 +89,8 @@ public class AdManager : MonoBehaviour
         GDPR.SetActive(false);
         Time.timeScale = 1;
         Destroy(GDPR);
-        
-        InitAd();
+
+        StartCoroutine(InitAd());
     }
 
 
@@ -89,20 +100,20 @@ public class AdManager : MonoBehaviour
         GDPR.SetActive(false);
         Time.timeScale = 1;
         Destroy(GDPR);
-        
-        InitAd();
+
+        StartCoroutine(InitAd());
     }
-    
+
     public void ShowInterstitial()
     {
         Advertisements.Instance.ShowInterstitial();
     }
-    
+
     public void ShowBanner()
     {
         Advertisements.Instance.ShowBanner(BannerPosition.BOTTOM, BannerType.Banner);
     }
-    
+
     public void ShowReward(UnityAction<bool> callback)
     {
         Advertisements.Instance.ShowRewardedVideo(callback);
