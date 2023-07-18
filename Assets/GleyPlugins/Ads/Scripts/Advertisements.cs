@@ -51,8 +51,10 @@ public enum UserConsent
 
 public class Advertisements : MonoBehaviour
 {
+    public UnityEvent OnInit = new UnityEvent();
+
     //name of the PlayerPrefs key to save consent and show ads status
-    private const string userConsent = "UserConsent";
+    public const string userConsent = "UserConsent";
     private const string ccpaConsent = "CcpaConsent";
     private const string removeAds = "RemoveAds";
 
@@ -406,6 +408,8 @@ public class Advertisements : MonoBehaviour
         ApplySettings();
 
         LoadFile();
+        
+        OnInit?.Invoke();
     }
 
 
@@ -428,6 +432,8 @@ public class Advertisements : MonoBehaviour
     /// <param name="InterstitialClosed">callback triggered when interstitial video is closed</param>
     public void ShowInterstitial(UnityAction InterstitialClosed = null)
     {
+        ScreenWriter.Write($"Show interstitial CanShowAds = {CanShowAds()}");
+
         //if ads are disabled by user -> do nothing
         if (CanShowAds() == false)
         {
@@ -435,6 +441,9 @@ public class Advertisements : MonoBehaviour
         }
 
         ICustomAds selectedAdvertiser = GetInterstitialAdvertiser();
+        
+        ScreenWriter.Write($"selectedAdvertiser = {selectedAdvertiser}");
+
         if (selectedAdvertiser != null)
         {
             if (debug)

@@ -20,7 +20,7 @@ namespace SpeedDash.Scripts.Manager
 		public float Speed = 1;
 		private bool isCan = false;
 		
-		void Start()
+		public void Init()
 		{
 			CanvasGroup.alpha = 0;
 			isCan = true;
@@ -39,7 +39,7 @@ namespace SpeedDash.Scripts.Manager
 		IEnumerator WaitForExplosion()
 		{
 			yield return new WaitForSeconds(DelayTime);
-			SceneManager.LoadScene(1);
+			// SceneManager.LoadScene(1);
 		}
 	}
 }

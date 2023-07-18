@@ -18,7 +18,6 @@ public class AdManager : MonoBehaviour
     public GameObject GDPR;
 
     public static AdManager Instance;
-    public bool _firstInit = true;
     
     public bool CanShowReward
     {
@@ -33,21 +32,21 @@ public class AdManager : MonoBehaviour
 
             Instance = this;
 
-            // show banner every scene loaded
-            SceneManager.sceneLoaded += (Scene s, LoadSceneMode lsm) =>
+            if (Advertisements.Instance.UserConsentWasSet() == false)
             {
-                if (Advertisements.Instance.UserConsentWasSet() == false)
+                if (GDPR == null)
                 {
-                    if (GDPR == null)
-                    {
-                        GameObject original = Resources.Load<GameObject>("CanvasGDPR");
-                        GDPR = UnityEngine.Object.Instantiate<GameObject>(original);
-                    }
-
-                    GDPR.SetActive(true);
-                    Time.timeScale = 0;
+                    GameObject original = Resources.Load<GameObject>("CanvasGDPR");
+                    GDPR = UnityEngine.Object.Instantiate<GameObject>(original);
                 }
-            };
+
+                GDPR.SetActive(true);
+                Time.timeScale = 0;
+            }
+            else
+            {
+                InitAd();
+            }
         }
         else
         {
@@ -56,13 +55,20 @@ public class AdManager : MonoBehaviour
     }
 
 
-    private void Start()
+    private void InitAd()
     {
+        Advertisements.Instance.OnInit.AddListener(() =>
+        {
+            Advertisements.Instance.OnInit.RemoveAllListeners();
+            
+            SceneManager.LoadScene(1);
+        });
+        
         Advertisements.Instance.Initialize();
-        Advertisements.Instance.ShowBanner(BannerPosition.BOTTOM, BannerType.Banner);
+        // Advertisements.Instance.ShowBanner(BannerPosition.BOTTOM, BannerType.Banner);
 
         // if (PlayerPrefs.HasKey("COMPLETE_GUIDE"))
-            Advertisements.Instance.ShowInterstitial();
+            // Advertisements.Instance.ShowInterstitial();
     }
 
 
@@ -72,6 +78,8 @@ public class AdManager : MonoBehaviour
         GDPR.SetActive(false);
         Time.timeScale = 1;
         Destroy(GDPR);
+        
+        InitAd();
     }
 
 
@@ -81,6 +89,18 @@ public class AdManager : MonoBehaviour
         GDPR.SetActive(false);
         Time.timeScale = 1;
         Destroy(GDPR);
+        
+        InitAd();
+    }
+    
+    public void ShowInterstitial()
+    {
+        Advertisements.Instance.ShowInterstitial();
+    }
+    
+    public void ShowBanner()
+    {
+        Advertisements.Instance.ShowBanner(BannerPosition.BOTTOM, BannerType.Banner);
     }
     
     public void ShowReward(UnityAction<bool> callback)

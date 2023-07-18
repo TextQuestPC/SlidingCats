@@ -25,7 +25,8 @@ namespace UI
         // Start is called before the first frame update
         void Awake()
         {
-            
+            AdManager.Instance.ShowInterstitial();
+            AdManager.Instance.ShowBanner();
 
             Application.targetFrameRate = Constant.FrameRate;
             Constant.InitData();

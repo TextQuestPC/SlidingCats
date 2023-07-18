@@ -31,7 +31,10 @@
             {
                 if (logMessage != null)
                 {
-                    GUI.Label(new Rect(0, 0, Screen.width, Screen.height), logMessage);
+                    GUIStyle myStyle = new GUIStyle();
+ 
+                    myStyle.fontSize = 26;
+                    GUI.Label(new Rect(0, 0, Screen.width, Screen.height), logMessage,myStyle);
                     if (GUI.Button(new Rect(Screen.width - 100, Screen.height - 100, 100, 100), "Clear"))
                     {
                         logMessage = null;
