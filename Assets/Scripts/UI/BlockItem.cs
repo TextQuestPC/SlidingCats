@@ -100,9 +100,7 @@ namespace UI
             if (gameObject.GetComponent<Touchable>() == null)
                 gameObject.AddComponent<Touchable>();
 
-            // if (data[(int)Blocks.Key.Length] >= 4 && PlayerPrefs.HasKey("COMPLETE_GUIDE"))
-            //     data[(int) Blocks.Key.Length]--;
-            //
+           
             GetComponent<Touchable>().objectID = data;
 
             _data = data;

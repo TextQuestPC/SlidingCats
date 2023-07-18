@@ -1606,6 +1606,19 @@ namespace UI
 
         GameObject CreateBlockItem(int[] data, bool specialGoldSuccess = false)
         {
+            if (data[(int)Blocks.Key.Length] >= 4)
+            {
+                Debug.Log($"CreateBlockItem");
+            }
+
+            if (data[(int)Blocks.Key.Length] >= 4 && PlayerPrefs.HasKey("COMPLETE_GUIDE"))
+            {
+                data[(int)Blocks.Key.Length]--;
+                Blocks.UpdateMap();
+                // StartCoroutine(Delay.Run(() => { MoveEnd(); }, 0.05f));
+                // Player.SaveGameStatusData();
+            }
+
             var item = _blockItemsPool.Get();
             item.transform.DOKill();
             item.transform.SetParent(blockGroup.transform);
