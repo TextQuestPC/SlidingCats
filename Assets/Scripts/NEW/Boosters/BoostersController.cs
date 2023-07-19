@@ -7,7 +7,7 @@ namespace Boosters
     public class BoostersController : Singleton<BoostersController>
     {
         private const string KEY_HAMMER = "Hammer", KEY_MAGNET = "Magnet";
-        private const int DEFAULT_COUNT_HAMMER = 4, DEFAULT_COUNT_MAGNET = 2;
+        private const int DEFAULT_COUNT_HAMMER = 4, DEFAULT_COUNT_MAGNET = 200;
 
         [SerializeField] private Booster hammerBooster, magnetBooster;
         [SerializeField] private GamePlayDialog gamePlayDialog;
@@ -17,7 +17,8 @@ namespace Boosters
         private int countHammer = 0, countMagnet = 0;
 
         private TypeBooster activeBooster;
-
+        private bool isMagnetSelected;
+        
         public bool BoosterIsActive;
 
         protected override void AfterAwaik()
@@ -83,7 +84,9 @@ namespace Boosters
                 if (countMagnet > 0)
                 {
                     activeBooster = TypeBooster.Magnet;
-                    BlockItem.Selected += UseMagnet;
+                    BlockItem.SelectedForMagnet += SelectedLineForMagnet;
+                    BlockItem.UseMagnet += UseMagnet;
+                    BlockItem.StopSelectedMagnet += DeselectLineForMagnet;
                     magnetBooster.SetActive(true);
                 }
                 else
@@ -107,6 +110,21 @@ namespace Boosters
             DisableBoosters();
 
             DOTween.Sequence().AppendInterval(0.1f).OnComplete(() => BoosterIsActive = false);
+        }
+
+        private void SelectedLineForMagnet(float posY)
+        {
+            isMagnetSelected = true;
+            gamePlayDialog.SelectLineForMagnet(posY);
+        }
+
+        private void DeselectLineForMagnet()
+        {
+            if (isMagnetSelected)
+            {
+                isMagnetSelected = false;
+                DisableBoosters();
+            }
         }
 
         private void UseMagnet(Vector2 position)
@@ -143,7 +161,13 @@ namespace Boosters
             activeBooster = TypeBooster.None;
 
             BlockItem.Touched -= UseHammer;
-            BlockItem.Selected -= UseMagnet;
+            BlockItem.SelectedForMagnet -= SelectedLineForMagnet;
+            BlockItem.UseMagnet -= UseMagnet;
+            BlockItem.StopSelectedMagnet -= DeselectLineForMagnet;
+
+            gamePlayDialog.UnselectLineForMagner();
+
+
             // BlockItem.OnPointerUp();
 
             magnetBooster.SetActive(false);

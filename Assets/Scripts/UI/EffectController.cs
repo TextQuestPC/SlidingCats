@@ -1163,7 +1163,30 @@ namespace UI
                 }, Constant.SecondChanceClearEffTime));
             });
         }
+
+        private GameObject magnetEffect;
         
+        public void ShowEffectMagnet(float posY)
+        {
+            magnetEffect = Instantiate(clearHangLightEff, effGroup.transform, false);
+            magnetEffect.transform.localScale = Vector2.one;
+
+            Debug.Log($"pos = {posY}");
+            magnetEffect.transform.position = new Vector2(0, posY + 0.28f);
+            magnetEffect.GetComponent<RectTransform>().sizeDelta = new Vector2(Constant.Lie * Constant.BlockWidth + 80,
+                /*Constant.SecondChanceHangNum **/ Constant.BlockHeight + 80);
+        }
+
+        public void HideEffectMagnet()
+        {
+            if (magnetEffect)
+            {
+                var effImg = magnetEffect.GetComponent<Image>();
+
+                effImg.DOFade(0, 0.5f).OnComplete(() => { Destroy(magnetEffect); });
+            }
+        }
+
         public void ShowClearSpecialEdgeEff(GameObject item, float delayTime = 0.02f, float opacity = 0.5f, float fadeTime = 0.2f)
         {
             if (item == null) return;

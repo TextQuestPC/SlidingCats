@@ -384,6 +384,16 @@ namespace UI
             Player.SaveGameStatusData();
         }
 
+        public void SelectLineForMagnet(float posY)
+        {
+            Constant.EffCtrlScript.ShowEffectMagnet(posY);
+        }
+        
+        public void UnselectLineForMagner()
+        {
+            Constant.EffCtrlScript.HideEffectMagnet();
+        }
+
         public void UseMagnet(Vector2 position)
         {
             var itemList = ItemList;
@@ -1606,11 +1616,6 @@ namespace UI
 
         GameObject CreateBlockItem(int[] data, bool specialGoldSuccess = false)
         {
-            if (data[(int)Blocks.Key.Length] >= 4)
-            {
-                Debug.Log($"CreateBlockItem");
-            }
-
             if (data[(int)Blocks.Key.Length] >= 4 && PlayerPrefs.HasKey("COMPLETE_GUIDE"))
             {
                 data[(int)Blocks.Key.Length]--;

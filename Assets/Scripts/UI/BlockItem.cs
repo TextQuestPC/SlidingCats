@@ -4,14 +4,17 @@ using Boosters;
 using Models;
 using Other;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace UI
 {
-    public class BlockItem : MonoBehaviour//, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
+    public class BlockItem : MonoBehaviour, IPointerExitHandler//, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
     {
         public static Action<int> Touched;
-        public static Action<Vector2> Selected;
+        public static Action<Vector2> UseMagnet;
+        public static Action<float> SelectedForMagnet;
+        public static Action StopSelectedMagnet;
         
         public GameObject blockImgNode;
         public Sprite[] blockSpriteFrameColor1;
@@ -137,7 +140,7 @@ namespace UI
         {
             Touched?.Invoke(GetPosIndex());
             SetOriginalPos();
-            Selected?.Invoke(OriginalPos);
+            SelectedForMagnet?.Invoke(transform.position.y);
             
             _tmpSprite = null;
             
@@ -167,9 +170,11 @@ namespace UI
             if (Constant.SceneVersion == "3")
             {
                 HideBlockBgLightEff();
+                
+                UseMagnet?.Invoke(OriginalPos);
             }
         }
-
+        
         public void OnBeginDrag(Vector2 pos)
         {
             Constant.GamePlayScript.ResetClearTipTime();
@@ -310,6 +315,11 @@ namespace UI
             {
                 _blockLightTip.SetActive(false);
             }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            StopSelectedMagnet?.Invoke();
         }
     }
 }
