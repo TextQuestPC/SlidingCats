@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Boosters;
 using DG.Tweening;
 using Manager;
 using Models;
@@ -81,6 +82,7 @@ namespace UI
 
         public void RemoveAllBlockItems()
         {
+            Debug.Log("RemoveAllBlockItems");
             ResetClearTipTime();
             for (var i = 0; i < _itemList.Length; ++i)
             {
@@ -1624,6 +1626,22 @@ namespace UI
                 // Player.SaveGameStatusData();
             }
 
+            TypeBooster typeBooster = TypeBooster.None;
+            
+            if (BoostersController.Instance.GoldBoosterIsReady)
+            {
+                typeBooster = TypeBooster.AddGold;
+            }
+            else if (BoostersController.Instance.BoosterIsActive)
+            {
+                typeBooster = BoostersController.Instance.GetRndBooster;
+            }
+
+            if (typeBooster != TypeBooster.None)
+            {
+                BoostersController.Instance.SpawnGetBooster(typeBooster);
+            }
+            
             var item = _blockItemsPool.Get();
             item.transform.DOKill();
             item.transform.SetParent(blockGroup.transform);
@@ -1632,7 +1650,7 @@ namespace UI
                 Constant.BlockGroupEdgeLeft + Constant.BlockWidth * Blocks.GetLieByPos(data[(int)Blocks.Key.Pos]),
                 Constant.BlockGroupEdgeBottom + Constant.BlockHeight * Blocks.GetHangByPos(data[(int)Blocks.Key.Pos]));
             item.transform.localRotation = Quaternion.Euler(0, 0, 0);
-            item.GetComponent<BlockItem>().UpdateUi(data, blockBgLightEff, blockBgTip, blockLightTip);
+            item.GetComponent<BlockItem>().UpdateUi(data, blockBgLightEff, blockBgTip, blockLightTip, typeBooster);
             item.GetComponent<CanvasGroup>().alpha = 1;
 
             if (item.GetComponent<BlockItem>().IsSpecial())

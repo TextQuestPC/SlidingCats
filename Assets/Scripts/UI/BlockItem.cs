@@ -22,6 +22,8 @@ namespace UI
         public Sprite[] blockSpriteFrameColor3;
         public Sprite[] blockSpriteFrameColor4;
         public Sprite[] blockSpriteFrameColor5;
+        [SerializeField] private Image _boosterImage;
+        [SerializeField] private Sprite goldBoosterSprite, hummerBoosterSprite, magnetBoosterSprite;
 
         private Sprite _tmpSprite;
         private Vector2 _startPos;
@@ -36,6 +38,8 @@ namespace UI
         private GameObject _blockBgLightEff;
         private GameObject _blockBgTip;
         private GameObject _blockLightTip;
+
+        private TypeBooster _typeBooster;
 
         public bool IsMovedBlockItem { get; set; } = false;
         public bool WillBeHangRemove { get; set; } = false;
@@ -98,12 +102,13 @@ namespace UI
             OriginalPos = GetComponent<RectTransform>().position;
         }
 
-        public void UpdateUi(int[] data, GameObject bgLightEff = null, GameObject bgTip = null, GameObject lightTip = null)
+        public void UpdateUi(int[] data, GameObject bgLightEff = null, GameObject bgTip = null, GameObject lightTip = null, TypeBooster typeBooster = TypeBooster.None)
         {
             if (gameObject.GetComponent<Touchable>() == null)
                 gameObject.AddComponent<Touchable>();
 
-           
+            _typeBooster = typeBooster;
+            
             GetComponent<Touchable>().objectID = data;
 
             _data = data;
@@ -134,6 +139,28 @@ namespace UI
 
             blockImgNode.GetComponent<Image>().sprite = _tmpSprite;
             gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(Constant.BlockWidth * blockLength, Constant.BlockHeight);
+
+            if (typeBooster != TypeBooster.None)
+            {
+                _boosterImage.gameObject.SetActive(true);
+                
+                switch (typeBooster)
+                {
+                    case TypeBooster.AddGold:
+                        _boosterImage.sprite = goldBoosterSprite;
+                        break;
+                    case TypeBooster.Hammer:
+                        _boosterImage.sprite = hummerBoosterSprite;
+                        break;
+                    case TypeBooster.Magnet:
+                        _boosterImage.sprite = magnetBoosterSprite;
+                        break;
+                }
+            }
+            else
+            {
+                _boosterImage.gameObject.SetActive(false);
+            }
         }
 
         public void OnPointerDown()

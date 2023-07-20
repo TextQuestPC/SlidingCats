@@ -1,14 +1,17 @@
+using System;
 using DG.Tweening;
 using UI;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Boosters
 {
     public class BoostersController : Singleton<BoostersController>
     {
         private const string KEY_HAMMER = "Hammer", KEY_MAGNET = "Magnet";
-        private const int DEFAULT_COUNT_HAMMER = 4, DEFAULT_COUNT_MAGNET = 200;
+        private const int DEFAULT_COUNT_HAMMER = 20, DEFAULT_COUNT_MAGNET = 200;
 
+        private const float START_GOLD_BOOSTER_TIME = 5, START_BOOSTER_TIME = 50;
         [SerializeField] private Booster hammerBooster, magnetBooster;
         [SerializeField] private GamePlayDialog gamePlayDialog;
         [SerializeField] private AudioSource audioSource;
@@ -17,9 +20,28 @@ namespace Boosters
         private int countHammer = 0, countMagnet = 0;
 
         private TypeBooster activeBooster;
-        private bool isMagnetSelected;
+        private bool isMagnetSelected, isGetMagnet;
+        private float goldBoosterTime, boosterTime;
         
         public bool BoosterIsActive;
+        public bool GoldBoosterIsReady{get=>goldBoosterTime<=0;}
+        public bool BoosterIsReady{get=>boosterTime<=0;}
+
+        public TypeBooster GetRndBooster
+        {
+            get
+            {
+                isGetMagnet = !isGetMagnet;
+                if (isGetMagnet)
+                {
+                    return TypeBooster.Magnet;
+                }
+                else
+                {
+                    return TypeBooster.Hammer;
+                }
+            }
+        }
 
         protected override void AfterAwaik()
         {
@@ -29,8 +51,36 @@ namespace Boosters
 
             hammerBooster.SetData(countHammer);
             magnetBooster.SetData(countMagnet);
+            
+            goldBoosterTime = START_GOLD_BOOSTER_TIME;
+            boosterTime = START_BOOSTER_TIME;
 
             BoosterIsActive = false;
+        }
+
+        private void Update()
+        {
+            if (goldBoosterTime > 0)
+            {
+                goldBoosterTime -= Time.deltaTime;
+            }
+            
+            if (boosterTime > 0)
+            {
+                boosterTime -= Time.deltaTime;
+            }
+        }
+
+        public void SpawnGetBooster(TypeBooster typeBooster)
+        {
+            if (typeBooster == TypeBooster.AddGold)
+            {
+                goldBoosterTime = START_GOLD_BOOSTER_TIME;
+            }
+            else
+            {
+                boosterTime = START_BOOSTER_TIME;
+            }
         }
 
         public void AddBooster(TypeBooster typeBooster, int count)
@@ -185,6 +235,7 @@ namespace Boosters
     {
         None,
         Hammer,
-        Magnet
+        Magnet,
+        AddGold
     }
 }

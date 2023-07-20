@@ -2189,6 +2189,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a09c88d2d0e714e5bbfa271cb7d894a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startGoldBoosterTime: 60
+  startBoosterTime: 210
   hammerBooster: {fileID: 810261652}
   magnetBooster: {fileID: 1898455716}
   gamePlayDialog: {fileID: 1278372383}
