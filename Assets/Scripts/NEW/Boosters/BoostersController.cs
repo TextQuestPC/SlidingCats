@@ -108,12 +108,12 @@ namespace Boosters
             if (typeBooster == TypeBooster.Hammer)
             {
                 countHammer += count;
-                hammerBooster.SetData(countHammer);
+                hammerBooster.SetData(countHammer, true);
             }
             else if (typeBooster == TypeBooster.Magnet)
             {
                 countMagnet += count;
-                magnetBooster.SetData(countMagnet);
+                magnetBooster.SetData(countMagnet, true);
             }
 
             SaveCountBooster();
