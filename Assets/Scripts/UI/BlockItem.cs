@@ -1,6 +1,7 @@
 ﻿using System;
 using BFF;
 using Boosters;
+using DG.Tweening;
 using Models;
 using Other;
 using UnityEngine;
@@ -347,7 +348,7 @@ namespace UI
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            StopSelectedMagnet?.Invoke();
+            DOTween.Sequence().AppendInterval(0.1f).OnComplete(() => StopSelectedMagnet?.Invoke());
         }
     }
 }

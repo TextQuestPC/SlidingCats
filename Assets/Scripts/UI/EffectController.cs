@@ -1171,7 +1171,6 @@ namespace UI
             magnetEffect = Instantiate(clearHangLightEff, effGroup.transform, false);
             magnetEffect.transform.localScale = Vector2.one;
 
-            Debug.Log($"pos = {posY}");
             magnetEffect.transform.position = new Vector2(0, posY + 0.28f);
             magnetEffect.GetComponent<RectTransform>().sizeDelta = new Vector2(Constant.Lie * Constant.BlockWidth + 80,
                 /*Constant.SecondChanceHangNum **/ Constant.BlockHeight + 80);
