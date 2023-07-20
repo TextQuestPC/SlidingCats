@@ -1673,6 +1673,12 @@ namespace UI
             if (_itemList[index] != null)
             {
                 var item = _itemList[index];
+                
+                if(item.GetComponent<BlockItem>().GetTypeBooster != TypeBooster.None)
+                {
+                    BoostersController.Instance.TakeBooster(item.GetComponent<BlockItem>().GetTypeBooster);
+                }
+                
                 if (showAnim)
                 {
                     item.GetComponent<CanvasGroup>().DOFade(0, Constant.BlockRemoveTime).OnComplete(() =>

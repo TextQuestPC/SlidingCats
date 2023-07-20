@@ -57,16 +57,6 @@ public class AdManager : MonoBehaviour
 
     private IEnumerator InitAd()
     {
-        
-
-        // Advertisements.Instance.OnInit.AddListener(() =>
-        // {
-        //     Advertisements.Instance.OnInit.RemoveAllListeners();
-        //
-        //
-        //     DOTween.Sequence().AppendInterval(8f).OnComplete(() => { });
-        // });
-
         Advertisements.Instance.Initialize();
         
         while (!Advertisements.Instance.IsInterstitialAvailable())
@@ -75,11 +65,6 @@ public class AdManager : MonoBehaviour
         }
 
         SceneManager.LoadScene(1);
-
-        // Advertisements.Instance.ShowBanner(BannerPosition.BOTTOM, BannerType.Banner);
-
-        // if (PlayerPrefs.HasKey("COMPLETE_GUIDE"))
-        // Advertisements.Instance.ShowInterstitial();
     }
 
 

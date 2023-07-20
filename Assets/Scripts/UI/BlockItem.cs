@@ -40,6 +40,7 @@ namespace UI
         private GameObject _blockLightTip;
 
         private TypeBooster _typeBooster;
+        public TypeBooster GetTypeBooster{get=>_typeBooster;}
 
         public bool IsMovedBlockItem { get; set; } = false;
         public bool WillBeHangRemove { get; set; } = false;

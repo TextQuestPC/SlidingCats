@@ -11,7 +11,7 @@ namespace Boosters
         private const string KEY_HAMMER = "Hammer", KEY_MAGNET = "Magnet";
         private const int DEFAULT_COUNT_HAMMER = 20, DEFAULT_COUNT_MAGNET = 200;
 
-        private const float START_GOLD_BOOSTER_TIME = 5, START_BOOSTER_TIME = 50;
+        private const float START_GOLD_BOOSTER_TIME = 60, START_BOOSTER_TIME = 10;
         [SerializeField] private Booster hammerBooster, magnetBooster;
         [SerializeField] private GamePlayDialog gamePlayDialog;
         [SerializeField] private AudioSource audioSource;
@@ -80,6 +80,14 @@ namespace Boosters
             else
             {
                 boosterTime = START_BOOSTER_TIME;
+            }
+        }
+
+        public void TakeBooster(TypeBooster typeBooster)
+        {
+            if (typeBooster == TypeBooster.AddGold)
+            {
+                AddGoldWindow.Instance.OpenWindow();
             }
         }
 
