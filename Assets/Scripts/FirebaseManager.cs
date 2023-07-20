@@ -39,7 +39,7 @@ namespace Core
 
         public static void LogEvent(string message)
         {
-            if (Instance && Instance.isActive && Advertisements.Instance.GetUserConsent() == UserConsent.Accept)
+            if (Instance && Instance.isActive)// && Advertisements.Instance.GetUserConsent() == UserConsent.Accept)
             {
                 FirebaseAnalytics.LogEvent(message);
                 Debug.Log($"Firebase {message}");
@@ -48,7 +48,7 @@ namespace Core
 
         public static void LogEvent(string nameEvent, Parameter[] parameters)
         {
-            if (Instance && Instance.isActive && Advertisements.Instance.GetUserConsent() == UserConsent.Accept)
+            if (Instance && Instance.isActive)// && Advertisements.Instance.GetUserConsent() == UserConsent.Accept)
             {
                 FirebaseAnalytics.LogEvent(nameEvent, parameters);
                 Debug.Log($"Firebase {nameEvent}");

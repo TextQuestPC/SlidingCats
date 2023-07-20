@@ -14,18 +14,18 @@ namespace PixelGame
 
         public static void LogEvent(string nameEvent)
         {
-            if (Advertisements.Instance.GetUserConsent() == UserConsent.Accept)
-            {
+            // if (Advertisements.Instance.GetUserConsent() == UserConsent.Accept)
+            // {
                 AppMetrica.Instance.ReportEvent(nameEvent);
-            }
+            // }
         }
 
         public static void LogEvent(string nameEvent, Dictionary<string, object> data)
         {
-            if (Advertisements.Instance.GetUserConsent() == UserConsent.Accept)
-            {
+            // if (Advertisements.Instance.GetUserConsent() == UserConsent.Accept)
+            // {
                 AppMetrica.Instance.ReportEvent(nameEvent, data);
-            }
+            // }
         }
     }
 }

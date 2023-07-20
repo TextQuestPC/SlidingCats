@@ -1,4 +1,6 @@
+using Core;
 using DG.Tweening;
+using PixelGame;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +20,9 @@ public class AddGoldWindow : Singleton<AddGoldWindow>
 
         claimButton.onClick.AddListener(() =>
         {
+            FirebaseManager.LogEvent("gift_claim");
+            AppmetricaController.LogEvent("gift_claim");
+            
             CloseWindow();
 
             GoldController.Instance.AddGold(CLAIM_VALUE);
@@ -25,6 +30,9 @@ public class AddGoldWindow : Singleton<AddGoldWindow>
 
         rewardButton.onClick.AddListener(() =>
         {
+            FirebaseManager.LogEvent("gift_claim_reward");
+            AppmetricaController.LogEvent("gift_claim_reward");
+            
             if (AdManager.Instance.CanShowReward)
             {
                 AdManager.Instance.ShowReward((bool isShow) =>
@@ -39,6 +47,9 @@ public class AddGoldWindow : Singleton<AddGoldWindow>
 
     public void OpenWindow()
     {
+        FirebaseManager.LogEvent("gift_open");
+        AppmetricaController.LogEvent("gift_open");
+        
         rewardButton.interactable = AdManager.Instance.CanShowReward;
 
         background.SetActive(true);
