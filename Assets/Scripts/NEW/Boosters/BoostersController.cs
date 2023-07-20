@@ -9,9 +9,9 @@ namespace Boosters
     public class BoostersController : Singleton<BoostersController>
     {
         private const string KEY_HAMMER = "Hammer", KEY_MAGNET = "Magnet";
-        private const int DEFAULT_COUNT_HAMMER = 20, DEFAULT_COUNT_MAGNET = 200;
+        private const int DEFAULT_COUNT_HAMMER = 4, DEFAULT_COUNT_MAGNET = 2;
 
-        private const float START_GOLD_BOOSTER_TIME = 60, START_BOOSTER_TIME = 10;
+        private const float START_GOLD_BOOSTER_TIME = 60, START_BOOSTER_TIME = 150;
         [SerializeField] private Booster hammerBooster, magnetBooster;
         [SerializeField] private GamePlayDialog gamePlayDialog;
         [SerializeField] private AudioSource audioSource;
@@ -22,10 +22,18 @@ namespace Boosters
         private TypeBooster activeBooster;
         private bool isMagnetSelected, isGetMagnet;
         private float goldBoosterTime, boosterTime;
-        
+
         public bool BoosterIsActive;
-        public bool GoldBoosterIsReady{get=>goldBoosterTime<=0;}
-        public bool BoosterIsReady{get=>boosterTime<=0;}
+
+        public bool GoldBoosterIsReady
+        {
+            get => goldBoosterTime <= 0;
+        }
+
+        public bool BoosterIsReady
+        {
+            get => boosterTime <= 0;
+        }
 
         public TypeBooster GetRndBooster
         {
@@ -51,7 +59,7 @@ namespace Boosters
 
             hammerBooster.SetData(countHammer);
             magnetBooster.SetData(countMagnet);
-            
+
             goldBoosterTime = START_GOLD_BOOSTER_TIME;
             boosterTime = START_BOOSTER_TIME;
 
@@ -64,7 +72,7 @@ namespace Boosters
             {
                 goldBoosterTime -= Time.deltaTime;
             }
-            
+
             if (boosterTime > 0)
             {
                 boosterTime -= Time.deltaTime;
@@ -88,6 +96,10 @@ namespace Boosters
             if (typeBooster == TypeBooster.AddGold)
             {
                 AddGoldWindow.Instance.OpenWindow();
+            }
+            else
+            {
+                AddBooster(typeBooster,1);
             }
         }
 

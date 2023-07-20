@@ -1632,7 +1632,7 @@ namespace UI
             {
                 typeBooster = TypeBooster.AddGold;
             }
-            else if (BoostersController.Instance.BoosterIsActive)
+            else if (BoostersController.Instance.BoosterIsReady)
             {
                 typeBooster = BoostersController.Instance.GetRndBooster;
             }
