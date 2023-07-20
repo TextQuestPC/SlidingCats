@@ -1,3 +1,4 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -21,6 +22,11 @@ public class GoldController : Singleton<GoldController>
         countGold += value;
         goldText.text = countGold.ToString();
         PlayerPrefs.SetInt(KEY_GOLD, countGold);
+
+        goldText.transform.DOScale(new Vector3(1.2f, 1.2f, 1.2f), 0.2f).OnComplete(() =>
+        {
+            goldText.transform.DOScale(new Vector3(1, 1, 1), 0.2f);
+        });
     }
 
     public void SpendGold(int value)
